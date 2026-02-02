@@ -1,5 +1,25 @@
 # Solución de Problemas Android
 
+## Error: Unable to launch Android Studio
+
+Si ves el error "Unable to launch Android Studio. Is it installed?":
+
+```bash
+# 1. Encuentra Android Studio
+which studio || find /opt /usr/share /snap /mnt -name "studio.sh" 2>/dev/null | head -1
+
+# 2. Configura la variable (ajusta la ruta según tu instalación)
+export CAPACITOR_ANDROID_STUDIO_PATH="/ruta/a/android-studio/bin/studio"
+
+# 3. Hazlo permanente agregando a ~/.bashrc o ~/.zshrc
+echo 'export CAPACITOR_ANDROID_STUDIO_PATH="/ruta/a/studio"' >> ~/.bashrc
+```
+
+**Alternativa**: Abre manualmente desde Android Studio:
+- Abre Android Studio
+- File → Open
+- Selecciona la carpeta `android/` del proyecto
+
 ## Error: ANDROID_HOME no configurado
 
 ```bash
