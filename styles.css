@@ -4261,6 +4261,12 @@ img[src=''] {
         gap: var(--spacing-sm);
     }
 
+    /* Hide shuffle and repeat buttons in mini player */
+    .now-playing-bar #shuffle-btn,
+    .now-playing-bar #repeat-btn {
+        display: none !important;
+    }
+
     .player-controls .buttons {
         gap: var(--spacing-sm);
         flex-wrap: nowrap;
