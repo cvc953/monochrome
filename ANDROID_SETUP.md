@@ -2,8 +2,8 @@
 
 ## Requisitos Previos
 
-1. **Node.js** (versión 16 o superior)
-2. **Java JDK** (versión 17 recomendada)
+1. **Node.js** (versión 22 o superior)
+2. **Java JDK** (versión 21 recomendada)
 3. **Android Studio** con Android SDK
 
 ## Instalar Android Studio

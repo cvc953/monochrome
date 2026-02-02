@@ -32,10 +32,10 @@ Agregar al `~/.bashrc` o `~/.zshrc` para hacerlo permanente.
 
 ## Error: Java version incorrecta
 
-Capacitor requiere Java JDK 17:
+Capacitor requiere Java JDK 21:
 
 ```bash
-sudo apt install openjdk-17-jdk  # Ubuntu/Debian
+sudo apt install openjdk-21-jdk  # Ubuntu/Debian
 # o descargar de: https://adoptium.net/
 ```
 
