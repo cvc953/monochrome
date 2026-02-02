@@ -4084,7 +4084,6 @@ img[src=''] {
     .app-container {
         grid-template:
             'header' auto
-            'sidebar' auto
             'main' 1fr
             'player' auto / 1fr;
         height: 100vh;
@@ -4094,6 +4093,7 @@ img[src=''] {
     .main-content {
         padding: var(--spacing-md);
         grid-area: main;
+        padding-bottom: calc(180px + var(--safe-area-bottom)) !important;
     }
 
     .main-header {
