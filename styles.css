@@ -794,6 +794,7 @@ input[type='search']::-webkit-search-cancel-button {
 }
 
 @keyframes pulse {
+
     0%,
     100% {
         opacity: 1;
@@ -1159,6 +1160,7 @@ input[type='search']::-webkit-search-cancel-button {
 }
 
 @media (max-width: 1100px) {
+
     #home-recommended-songs,
     #artist-detail-tracks,
     #playlist-detail-recommended {
@@ -1755,11 +1757,11 @@ input[type='search']::-webkit-search-cancel-button {
     box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
 }
 
-input:checked + .slider {
+input:checked+.slider {
     background-color: var(--primary);
 }
 
-input:checked + .slider::before {
+input:checked+.slider::before {
     transform: translateX(16px);
     background-color: var(--primary-foreground);
     box-shadow: -2px 2px 4px rgb(0, 0, 0, 0.1);
@@ -1771,7 +1773,7 @@ input:checked + .slider::before {
     /* Hover scale effect */
 }
 
-input:checked + .toggle-switch:hover .slider::before {
+input:checked+.toggle-switch:hover .slider::before {
     transform: translateX(16px) scale(1.1);
 }
 
@@ -3012,7 +3014,7 @@ input:checked + .toggle-switch:hover .slider::before {
 
 #download-notifications {
     position: fixed;
-    bottom: 120px;
+    bottom: calc(var(--player-bar-height-desktop) + 20px + var(--safe-area-bottom));
     right: 20px;
     z-index: 9999;
     max-width: 350px;
@@ -3117,7 +3119,7 @@ input:checked + .toggle-switch:hover .slider::before {
 .update-notification,
 .install-prompt {
     position: fixed;
-    bottom: 130px;
+    bottom: calc(var(--player-bar-height-desktop) + 30px + var(--safe-area-bottom));
     right: 20px;
     background: var(--card);
     border: 1px solid var(--border);
@@ -4265,7 +4267,7 @@ img[src=''] {
     }
 
     #download-notifications {
-        bottom: 10px;
+        bottom: calc(var(--player-bar-height-mobile) + 12px + var(--safe-area-bottom));
         right: 10px;
         left: 10px;
         max-width: none;
@@ -4372,7 +4374,7 @@ img[src=''] {
         left: 10px;
         right: 10px;
         max-width: none;
-        bottom: 10px;
+        bottom: calc(var(--player-bar-height-mobile) + 16px + var(--safe-area-bottom));
     }
 
     .side-panel {

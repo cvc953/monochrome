@@ -9,6 +9,7 @@ import {
 import { APICache } from './cache.js';
 import { addMetadataToAudio } from './metadata.js';
 import { DashDownloader } from './dash-downloader.js';
+import { saveBlobToDevice } from './native-download.js';
 
 export const DASH_MANIFEST_UNAVAILABLE_CODE = 'DASH_MANIFEST_UNAVAILABLE';
 
@@ -1003,7 +1004,7 @@ export class LosslessAPI {
                 finalFilename = filename.replace(/\.[^.]+$/, `.${detectedExtension}`);
             }
 
-            this.triggerDownload(blob, finalFilename);
+            await this.triggerDownload(blob, finalFilename);
         } catch (error) {
             if (error.name === 'AbortError') {
                 throw error;
@@ -1016,7 +1017,12 @@ export class LosslessAPI {
         }
     }
 
-    triggerDownload(blob, filename) {
+    async triggerDownload(blob, filename) {
+        const result = await saveBlobToDevice(blob, filename);
+        if (result.saved) {
+            return;
+        }
+
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;

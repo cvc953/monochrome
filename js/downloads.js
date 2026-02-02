@@ -14,6 +14,7 @@ import { lyricsSettings, bulkDownloadSettings, playlistSettings } from './storag
 import { addMetadataToAudio } from './metadata.js';
 import { DashDownloader } from './dash-downloader.js';
 import { generateM3U, generateM3U8, generateCUE, generateNFO, generateJSON } from './playlist-generator.js';
+import { saveBlobToDevice } from './native-download.js';
 
 const downloadTasks = new Map();
 const bulkDownloadTasks = new Map();
@@ -247,7 +248,12 @@ async function downloadTrackBlob(track, quality, api, lyricsManager = null, sign
     return { blob, extension };
 }
 
-function triggerDownload(blob, filename) {
+async function triggerDownload(blob, filename) {
+    const result = await saveBlobToDevice(blob, filename);
+    if (result.saved) {
+        return;
+    }
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -272,7 +278,7 @@ async function bulkDownloadSequentially(tracks, api, quality, lyricsManager, not
         try {
             const { blob, extension } = await downloadTrackBlob(track, quality, api, null, signal);
             const filename = buildTrackFilename(track, quality, extension);
-            triggerDownload(blob, filename);
+            await triggerDownload(blob, filename);
 
             if (lyricsManager && lyricsSettings.shouldDownloadLyrics()) {
                 try {
@@ -282,7 +288,7 @@ async function bulkDownloadSequentially(tracks, api, quality, lyricsManager, not
                         if (lrcContent) {
                             const lrcFilename = filename.replace(/\.[^.]+$/, '.lrc');
                             const lrcBlob = new Blob([lrcContent], { type: 'text/plain' });
-                            triggerDownload(lrcBlob, lrcFilename);
+                            await triggerDownload(lrcBlob, lrcFilename);
                         }
                     }
                 } catch {
@@ -681,12 +687,12 @@ function createBulkDownloadNotification(type, name, _totalItems) {
         type === 'album'
             ? 'Album'
             : type === 'playlist'
-              ? 'Playlist'
-              : type === 'liked'
-                ? 'Liked Tracks'
-                : type === 'queue'
-                  ? 'Queue'
-                  : 'Discography';
+                ? 'Playlist'
+                : type === 'liked'
+                    ? 'Liked Tracks'
+                    : type === 'queue'
+                        ? 'Queue'
+                        : 'Discography';
 
     notifEl.innerHTML = `
         <div style="display: flex; align-items: start; gap: 0.75rem;">

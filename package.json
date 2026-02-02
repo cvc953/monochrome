@@ -49,6 +49,7 @@
         "@capacitor/android": "^8.0.2",
         "@capacitor/cli": "^8.0.2",
         "@capacitor/core": "^8.0.2",
+        "@capacitor/filesystem": "^8.0.2",
         "dashjs": "^5.1.1",
         "pocketbase": "^0.26.5"
     }
