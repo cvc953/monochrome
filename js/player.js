@@ -249,7 +249,7 @@ export class Player {
                 // Warm connection/cache
                 // For Blob URLs (DASH), this head request is not needed and can cause errors.
                 if (!streamUrl.startsWith('blob:')) {
-                    fetch(streamUrl, { method: 'HEAD', signal: this.preloadAbortController.signal }).catch(() => {});
+                    fetch(streamUrl, { method: 'HEAD', signal: this.preloadAbortController.signal }).catch(() => { });
                 }
             } catch (error) {
                 if (error.name !== 'AbortError') {
@@ -290,7 +290,37 @@ export class Player {
 
         document.querySelector('.now-playing-bar .cover').src = this.api.getCoverUrl(track.album?.cover);
         const qualityBadge = createQualityBadgeHTML(track);
-        document.querySelector('.now-playing-bar .title').innerHTML = `${trackTitle} ${qualityBadge}`;
+        const titleEl = document.querySelector('.now-playing-bar .title');
+        titleEl.innerHTML = `${trackTitle} ${qualityBadge}`;
+
+        // Check if title overflows and add marquee animation
+        setTimeout(() => {
+            // Get the text content without the quality badge
+            const computedStyle = window.getComputedStyle(titleEl);
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'absolute';
+            tempDiv.style.visibility = 'hidden';
+            tempDiv.style.whiteSpace = 'nowrap';
+            tempDiv.style.fontSize = computedStyle.fontSize;
+            tempDiv.style.fontWeight = computedStyle.fontWeight;
+            tempDiv.style.fontFamily = computedStyle.fontFamily;
+            tempDiv.textContent = trackTitle;
+            document.body.appendChild(tempDiv);
+            
+            const textWidth = tempDiv.offsetWidth;
+            document.body.removeChild(tempDiv);
+            
+            // Add padding for quality badge space
+            const containerWidth = titleEl.parentElement.offsetWidth;
+            const isOverflowing = textWidth > (containerWidth - 40);
+            
+            if (isOverflowing) {
+                titleEl.setAttribute('data-overflow', 'true');
+            } else {
+                titleEl.removeAttribute('data-overflow');
+            }
+        }, 0);
+
         const albumEl = document.querySelector('.now-playing-bar .album');
         if (albumEl) {
             const albumTitle = track.album?.title || '';
