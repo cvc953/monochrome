@@ -306,14 +306,14 @@ export class Player {
             tempDiv.style.fontFamily = computedStyle.fontFamily;
             tempDiv.textContent = trackTitle;
             document.body.appendChild(tempDiv);
-            
+
             const textWidth = tempDiv.offsetWidth;
             document.body.removeChild(tempDiv);
-            
+
             // Add padding for quality badge space
             const containerWidth = titleEl.parentElement.offsetWidth;
             const isOverflowing = textWidth > (containerWidth - 40);
-            
+
             if (isOverflowing) {
                 titleEl.setAttribute('data-overflow', 'true');
             } else {
