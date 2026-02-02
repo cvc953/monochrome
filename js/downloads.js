@@ -15,6 +15,7 @@ import { addMetadataToAudio } from './metadata.js';
 import { DashDownloader } from './dash-downloader.js';
 import { generateM3U, generateM3U8, generateCUE, generateNFO, generateJSON } from './playlist-generator.js';
 import { saveBlobToDevice } from './native-download.js';
+import { downloadsTracker } from './downloads-tracker.js';
 
 const downloadTasks = new Map();
 const bulkDownloadTasks = new Map();
@@ -89,6 +90,9 @@ export function addDownloadTask(trackId, track, filename, api, abortController) 
 
     container.appendChild(taskEl);
 
+    // Add to tracker
+    downloadsTracker.startDownload(trackId, trackTitle, trackArtists);
+
     downloadTasks.set(trackId, { taskEl, abortController });
 
     taskEl.querySelector('.download-cancel').addEventListener('click', () => {
@@ -135,6 +139,9 @@ export function completeDownloadTask(trackId, success = true, message = null) {
         statusEl.style.color = '#10b981';
         cancelBtn.remove();
 
+        // Mark as completed in tracker
+        downloadsTracker.completeDownload(trackId);
+
         setTimeout(() => removeDownloadTask(trackId), 3000);
     } else {
         progressFill.style.background = '#ef4444';
@@ -144,6 +151,9 @@ export function completeDownloadTask(trackId, success = true, message = null) {
             ${SVG_CLOSE}
         `;
         cancelBtn.onclick = () => removeDownloadTask(trackId);
+
+        // Mark as failed in tracker
+        downloadsTracker.failDownload(trackId, message || 'Download failed');
 
         setTimeout(() => removeDownloadTask(trackId), 5000);
     }

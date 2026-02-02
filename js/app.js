@@ -24,6 +24,7 @@ import { registerSW } from 'virtual:pwa-register';
 import './smooth-scrolling.js';
 import { readTrackMetadata } from './metadata.js';
 import { initTracker } from './tracker.js';
+import initDownloadsPage from './downloads-page.js';
 
 function initializeCasting(audioPlayer, castBtn) {
     if (!castBtn) return;
@@ -328,6 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initializeKeyboardShortcuts(player, audioPlayer);
 
     initTracker(player);
+    initDownloadsPage();
 
     const castBtn = document.getElementById('cast-btn');
     initializeCasting(audioPlayer, castBtn);

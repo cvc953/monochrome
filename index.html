@@ -899,6 +899,26 @@
                     <nav class="sidebar-nav">
                         <ul>
                             <li class="nav-item">
+                                <a href="/downloads">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="24"
+                                        height="24"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" x2="12" y1="15" y2="3" />
+                                    </svg>
+                                    <span>Downloads</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="/about">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -920,7 +940,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="/download">
+                                <a href="/desktop-download">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         width="24"
@@ -2923,7 +2943,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="page-download" class="page">
+                <div id="page-desktop-download" class="page">
                     <h2 class="section-title" style="text-align: center">Monochrome Official App</h2>
                     <div class="download-content">
                         <p style="text-align: center" class="account-description">
@@ -3025,6 +3045,42 @@
                             It helps pay for the domain, and you get to support us :)
                         </p>
                         <button id="donate-btn-page" class="btn-secondary">Donate to Monochrome</button>
+                    </div>
+                </div>
+
+                <div id="page-downloads" class="page">
+                    <h2 class="section-title">Downloads</h2>
+                    <div class="downloads-container">
+                        <div class="downloads-tabs">
+                            <button class="downloads-tab active" data-tab="active">Active Downloads</button>
+                            <button class="downloads-tab" data-tab="history">History</button>
+                        </div>
+                        
+                        <div class="downloads-tab-content" id="downloads-active">
+                            <div class="downloads-list" id="downloads-active-list">
+                                <div class="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" x2="12" y1="15" y2="3" />
+                                    </svg>
+                                    <p>No active downloads</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="downloads-tab-content" id="downloads-history" style="display: none">
+                            <div class="downloads-list" id="downloads-history-list">
+                                <div class="empty-state">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10" />
+                                        <polyline points="12 6 12 12 16 14" />
+                                    </svg>
+                                    <p>No download history</p>
+                                </div>
+                            </div>
+                            <button class="btn-secondary" id="clear-history-btn" style="margin-top: 1rem; display: none;">Clear History</button>
+                        </div>
                     </div>
                 </div>
             </main>
