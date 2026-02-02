@@ -4082,6 +4082,7 @@ img[src=''] {
     .app-container {
         grid-template:
             'header' auto
+            'sidebar' auto
             'main' 1fr
             'player' auto / 1fr;
         height: 100vh;
