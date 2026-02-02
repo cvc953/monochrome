@@ -10,10 +10,10 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks: {
-                    vendor: ['pocketbase', 'dashjs']
-                }
-            }
-        }
+                    vendor: ['pocketbase', 'dashjs'],
+                },
+            },
+        },
     },
     plugins: [
         VitePWA({

@@ -3,6 +3,7 @@
 ## Uso del Workflow
 
 El workflow se ejecuta automáticamente cuando:
+
 - Haces `push` a las ramas main/master/develop
 - Creas un Pull Request
 - Lo ejecutas manualmente
@@ -20,28 +21,30 @@ El workflow se ejecuta automáticamente cuando:
 2. Click en el workflow ejecutado
 3. Baja hasta **Artifacts**
 4. Descarga:
-   - `monochrome-debug.apk` - APK de debug (listo para instalar)
-   - `monochrome-release-unsigned.apk` - APK de release sin firmar
+    - `monochrome-debug.apk` - APK de debug (listo para instalar)
+    - `monochrome-release-unsigned.apk` - APK de release sin firmar
 
 ## Firmar APK para Producción
 
 El APK de release necesita ser firmado. Puedes configurar GitHub Secrets:
 
 1. Genera un keystore:
+
 ```bash
 keytool -genkey -v -keystore monochrome.keystore -alias monochrome -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 2. Convierte a base64:
+
 ```bash
 base64 monochrome.keystore > keystore.b64
 ```
 
 3. Agrega estos secrets en GitHub (Settings → Secrets → Actions):
-   - `KEYSTORE_FILE` - Contenido del archivo keystore.b64
-   - `KEYSTORE_PASSWORD` - Contraseña del keystore
-   - `KEY_ALIAS` - Alias de la clave
-   - `KEY_PASSWORD` - Contraseña de la clave
+    - `KEYSTORE_FILE` - Contenido del archivo keystore.b64
+    - `KEYSTORE_PASSWORD` - Contraseña del keystore
+    - `KEY_ALIAS` - Alias de la clave
+    - `KEY_PASSWORD` - Contraseña de la clave
 
 4. El workflow automáticamente firmará el APK en releases
 

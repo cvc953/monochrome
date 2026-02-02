@@ -7,6 +7,7 @@ npm run android:build
 ```
 
 Esto ejecuta:
+
 1. `npm run build` - Compila el proyecto web
 2. `npx cap sync android` - Sincroniza archivos con Android
 

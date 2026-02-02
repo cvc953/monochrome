@@ -2,20 +2,20 @@
 
 ## Scripts Android
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run android:build` | Compila web + sincroniza con Android |
-| `npm run android:open` | Abre el proyecto en Android Studio |
-| `npm run android:run` | Compila y ejecuta en dispositivo/emulador |
+| Comando                 | Descripción                               |
+| ----------------------- | ----------------------------------------- |
+| `npm run android:build` | Compila web + sincroniza con Android      |
+| `npm run android:open`  | Abre el proyecto en Android Studio        |
+| `npm run android:run`   | Compila y ejecuta en dispositivo/emulador |
 
 ## Scripts Originales
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run dev` | Servidor de desarrollo (web) |
-| `npm run build` | Compila proyecto web |
-| `npm run preview` | Preview del build |
-| `npm run lint` | Ejecuta todos los linters |
+| Comando           | Descripción                  |
+| ----------------- | ---------------------------- |
+| `npm run dev`     | Servidor de desarrollo (web) |
+| `npm run build`   | Compila proyecto web         |
+| `npm run preview` | Preview del build            |
+| `npm run lint`    | Ejecuta todos los linters    |
 
 ## Flujo de Trabajo Típico
 

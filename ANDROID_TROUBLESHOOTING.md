@@ -16,6 +16,7 @@ echo 'export CAPACITOR_ANDROID_STUDIO_PATH="/ruta/a/studio"' >> ~/.bashrc
 ```
 
 **Alternativa**: Abre manualmente desde Android Studio:
+
 - Abre Android Studio
 - File → Open
 - Selecciona la carpeta `android/` del proyecto
