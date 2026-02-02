@@ -1,0 +1,16 @@
+{
+  "appId": "com.monochrome.app",
+  "appName": "Monochrome Music",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "allowNavigation": [
+      "*"
+    ]
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  }
+}

@@ -6,6 +6,14 @@ export default defineConfig({
     build: {
         outDir: 'dist',
         emptyOutDir: true,
+        // Optimizaciones para Capacitor/Android
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['pocketbase', 'dashjs']
+                }
+            }
+        }
     },
     plugins: [
         VitePWA({

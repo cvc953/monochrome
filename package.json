@@ -13,7 +13,10 @@
         "lint:html": "htmlhint \"**/*.html\" --ignore=\"dist/**,legacy/**,node_modules/**\"",
         "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
         "format": "prettier --write .",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "android:build": "npm run build && npx cap sync android",
+        "android:open": "npx cap open android",
+        "android:run": "npm run android:build && npx cap run android"
     },
     "repository": {
         "type": "git",
@@ -43,7 +46,10 @@
         "source-map": "^0.7.4"
     },
     "dependencies": {
-        "pocketbase": "^0.26.5",
-        "dashjs": "^5.1.1"
+        "@capacitor/android": "^8.0.2",
+        "@capacitor/cli": "^8.0.2",
+        "@capacitor/core": "^8.0.2",
+        "dashjs": "^5.1.1",
+        "pocketbase": "^0.26.5"
     }
 }
