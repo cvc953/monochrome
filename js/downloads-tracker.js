@@ -60,16 +60,16 @@ class DownloadsTracker {
             download.status = 'completed';
             download.endTime = Date.now();
             download.progress = 100;
-            
+
             // Move to history
             this.downloadHistory.unshift(download); // Add to beginning
             this.activeDownloads.delete(id);
-            
+
             // Keep only last 50 downloads in history
             if (this.downloadHistory.length > 50) {
                 this.downloadHistory = this.downloadHistory.slice(0, 50);
             }
-            
+
             this.saveHistory();
             this.notifyListeners();
         }
@@ -82,11 +82,11 @@ class DownloadsTracker {
             download.status = 'failed';
             download.endTime = Date.now();
             download.error = error;
-            
+
             // Move to history
             this.downloadHistory.unshift(download);
             this.activeDownloads.delete(id);
-            
+
             this.saveHistory();
             this.notifyListeners();
         }
@@ -147,7 +147,7 @@ class DownloadsTracker {
         const seconds = Math.floor((ms % 60000) / 1000);
         const minutes = Math.floor((ms % 3600000) / 60000);
         const hours = Math.floor(ms / 3600000);
-        
+
         if (hours > 0) {
             return `${hours}h ${minutes}m`;
         } else if (minutes > 0) {

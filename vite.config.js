@@ -8,6 +8,7 @@ export default defineConfig({
         emptyOutDir: true,
         // Optimizaciones para Capacitor/Android
         rollupOptions: {
+            external: ['@capacitor/filesystem', '@capacitor/core'],
             output: {
                 manualChunks: {
                     vendor: ['pocketbase', 'dashjs'],

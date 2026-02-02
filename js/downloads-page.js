@@ -108,7 +108,7 @@ function renderHistory() {
         const statusClass = download.status === 'completed' ? 'success' : 'error';
         const statusText = download.status === 'completed' ? 'Completed' : 'Failed';
         const duration = download.endTime ? downloadsTracker.constructor.formatDuration(download.endTime - download.startTime) : '';
-        
+
         return `
             <div class="download-item download-item-${download.status}" data-id="${download.id}">
                 <div class="download-info">
