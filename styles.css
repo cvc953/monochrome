@@ -1818,7 +1818,6 @@ input:checked + .toggle-switch:hover .slider::before {
     transition: color var(--transition);
     position: relative;
     min-width: 0;
-    display: block;
 }
 
 .track-info .details .title[data-overflow='true'] {
