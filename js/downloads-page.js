@@ -67,7 +67,9 @@ function renderActive() {
         return;
     }
 
-    list.innerHTML = activeDownloads.map(download => `
+    list.innerHTML = activeDownloads
+        .map(
+            (download) => `
         <div class="download-item" data-id="${download.id}">
             <div class="download-info">
                 <div class="download-title">${escapeHtml(download.name)}</div>
@@ -81,7 +83,9 @@ function renderActive() {
             </div>
             ${download.fileSize ? `<div class="download-size">${downloadsTracker.constructor.formatFileSize(download.downloadedSize)} / ${downloadsTracker.constructor.formatFileSize(download.fileSize)}</div>` : ''}
         </div>
-    `).join('');
+    `
+        )
+        .join('');
 }
 
 function renderHistory() {
@@ -104,12 +108,15 @@ function renderHistory() {
     }
 
     clearBtn.style.display = 'block';
-    list.innerHTML = history.map(download => {
-        const statusClass = download.status === 'completed' ? 'success' : 'error';
-        const statusText = download.status === 'completed' ? 'Completed' : 'Failed';
-        const duration = download.endTime ? downloadsTracker.constructor.formatDuration(download.endTime - download.startTime) : '';
+    list.innerHTML = history
+        .map((download) => {
+            const statusClass = download.status === 'completed' ? 'success' : 'error';
+            const statusText = download.status === 'completed' ? 'Completed' : 'Failed';
+            const duration = download.endTime
+                ? downloadsTracker.constructor.formatDuration(download.endTime - download.startTime)
+                : '';
 
-        return `
+            return `
             <div class="download-item download-item-${download.status}" data-id="${download.id}">
                 <div class="download-info">
                     <div class="download-title">${escapeHtml(download.name)}</div>
@@ -122,7 +129,8 @@ function renderHistory() {
                 ${download.fileSize ? `<div class="download-size">${downloadsTracker.constructor.formatFileSize(download.fileSize)}</div>` : ''}
             </div>
         `;
-    }).join('');
+        })
+        .join('');
 }
 
 function escapeHtml(text) {

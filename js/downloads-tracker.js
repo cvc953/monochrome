@@ -16,12 +16,12 @@ class DownloadsTracker {
 
     // Remove listener
     removeListener(callback) {
-        this.listeners = this.listeners.filter(l => l !== callback);
+        this.listeners = this.listeners.filter((l) => l !== callback);
     }
 
     // Notify all listeners of changes
     notifyListeners() {
-        this.listeners.forEach(callback => callback());
+        this.listeners.forEach((callback) => callback());
     }
 
     // Start a new download
@@ -35,7 +35,7 @@ class DownloadsTracker {
             startTime: Date.now(),
             endTime: null,
             fileSize: 0,
-            downloadedSize: 0
+            downloadedSize: 0,
         };
         this.activeDownloads.set(id, download);
         this.notifyListeners();
