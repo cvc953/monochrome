@@ -4066,6 +4066,9 @@ img[src=''] {
         flex-wrap: wrap;
         justify-content: space-between;
         gap: var(--spacing-sm);
+        padding-top: var(--safe-area-top);
+        padding-left: var(--spacing-sm);
+        padding-right: var(--spacing-sm);
     }
 
     .navigation-controls {
@@ -4074,6 +4077,7 @@ img[src=''] {
 
     .hamburger-menu {
         order: 1;
+        margin-top: var(--spacing-xs);
     }
 
     .search-bar {
@@ -4198,9 +4202,11 @@ img[src=''] {
             'track controls' auto
             'progress progress' auto / 1fr auto;
         gap: var(--spacing-sm);
-        padding: var(--spacing-sm) var(--spacing-md);
-        height: var(--player-bar-height-mobile);
-        bottom: calc(10px + var(--safe-area-bottom)) !important;
+        padding: var(--spacing-md);
+        padding-bottom: calc(var(--spacing-md) + var(--safe-area-bottom));
+        min-height: var(--player-bar-height-mobile);
+        height: auto;
+        bottom: 10px !important;
     }
 
     .now-playing-bar .track-info {
@@ -4240,20 +4246,29 @@ img[src=''] {
     .now-playing-bar .player-controls {
         grid-area: progress;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-sm);
     }
 
     .player-controls .buttons {
-        gap: var(--spacing-md);
+        gap: var(--spacing-sm);
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
     }
 
     .player-controls .buttons button {
-        width: 28px;
-        height: 28px;
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
     }
 
     .player-controls .buttons .play-pause-btn {
-        width: 32px;
-        height: 32px;
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
     }
 
     .desktop-only {
