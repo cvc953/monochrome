@@ -3642,14 +3642,10 @@ img[src=''] {
 }
 
 .fullscreen-lyrics-toggle {
-    position: absolute;
-    bottom: 8rem;
-    left: 50%;
-    transform: translateX(-50%);
     background: rgb(0, 0, 0, 0.5);
     border: none;
     color: white;
-    padding: 0.75rem;
+    padding: 0.5rem;
     border-radius: 50%;
     cursor: pointer;
     z-index: 1001;
@@ -3657,6 +3653,8 @@ img[src=''] {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
+    margin-left: 1rem;
+    flex-shrink: 0;
 }
 
 .fullscreen-lyrics-toggle:hover {
