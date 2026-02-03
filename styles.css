@@ -1861,6 +1861,7 @@ input:checked+.toggle-switch:hover .slider::before {
     display: flex;
     align-items: center;
     gap: var(--spacing-md);
+    margin-top: -16px;
 }
 
 .player-controls .buttons button {
