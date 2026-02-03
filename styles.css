@@ -2236,15 +2236,13 @@ input:checked+.toggle-switch:hover .slider::before {
 
 .fullscreen-cover-content {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100%;
     position: relative;
     padding: 1rem;
-    overflow: auto;
-    max-height: 100vh;
 }
 
 #close-fullscreen-cover-btn {
@@ -2258,13 +2256,12 @@ input:checked+.toggle-switch:hover .slider::before {
 #fullscreen-cover-image {
     max-width: 90%;
     width: 90%;
-    max-height: 70vh;
+    max-height: 55vh;
     border-radius: var(--radius);
     box-shadow: 0 20px 50px rgb(0, 0, 0, 0.5);
     object-fit: contain;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
     z-index: 1;
-    flex-shrink: 0;
 }
 
 .fullscreen-track-info {
@@ -2272,18 +2269,15 @@ input:checked+.toggle-switch:hover .slider::before {
     z-index: 1;
     max-width: 90%;
     width: 90%;
-    min-width: 0;
     margin-left: auto;
     margin-right: auto;
     background-color: color-mix(in srgb, var(--card) 40%, transparent);
     backdrop-filter: blur(20px);
-    padding: 1rem 2rem;
+    padding: 0.75rem 1.5rem;
     border-radius: var(--radius);
     border: 1px solid var(--border);
     box-shadow: 0 8px 32px rgb(0, 0, 0, 0.4);
     overflow: hidden;
-    max-height: 250px;
-    flex-shrink: 0;
 }
 
 #fullscreen-track-title {
@@ -2293,25 +2287,25 @@ input:checked+.toggle-switch:hover .slider::before {
     color: var(--foreground);
     white-space: nowrap;
     overflow: hidden;
-    max-width: 25ch;
+    text-overflow: ellipsis;
+    max-width: 100%;
     width: 100%;
     min-width: 0;
     display: block;
     position: relative;
-    animation: marquee-auto 20s linear infinite;
 }
 
 #fullscreen-track-title:hover {
-    animation: marquee-auto 20s linear infinite;
+    animation: marquee 10s linear infinite;
 }
 
-@keyframes marquee-auto {
+@keyframes marquee {
     0% {
         transform: translateX(0);
     }
 
     100% {
-        transform: translateX(-100%);
+        transform: translateX(calc(-100% + 90vw));
     }
 }
 
@@ -2322,7 +2316,7 @@ input:checked+.toggle-switch:hover .slider::before {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 25ch;
+    max-width: 100%;
     width: 100%;
     min-width: 0;
     display: block;
@@ -3654,18 +3648,16 @@ img[src=''] {
 }
 
 .fullscreen-main-view {
-    flex: 0;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1rem 2rem 2rem;
+    padding: 6rem 2rem 2rem;
     transition:
         flex 0.3s ease,
         padding-right 0.3s ease,
         margin-right 0.3s ease;
-    max-width: 100%;
-    width: 100%;
 }
 
 .fullscreen-lyrics-toggle {
@@ -4692,29 +4684,6 @@ img[src=''] {
     .player-controls .buttons {
         justify-content: space-between;
         width: 100%;
-    }
-
-    #fullscreen-cover-image {
-        max-height: 80vh;
-    }
-
-    .fullscreen-track-info {
-        max-height: 280px;
-        padding: 1.5rem 2rem;
-    }
-}
-
-@media (max-height: 700px) {
-    #fullscreen-cover-image {
-        max-height: 75vh;
-    }
-
-    .fullscreen-track-info {
-        max-height: 280px;
-    }
-
-    .fullscreen-main-view {
-        padding: 0.5rem 2rem 1rem;
     }
 }
 
