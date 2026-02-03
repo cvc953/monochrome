@@ -2241,25 +2241,7 @@ input:checked+.toggle-switch:hover .slider::before {
 }
 
 #close-fullscreen-cover-btn {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background-color: var(--background);
-    border: none;
-    color: var(--foreground);
-    font-size: 2rem;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition:
-        opacity 0.2s,
-        right 0.3s ease;
-    z-index: 2001;
-    opacity: 0.5;
+    display: none !important;
 }
 
 #close-fullscreen-cover-btn:hover {
@@ -3661,8 +3643,9 @@ img[src=''] {
 
 .fullscreen-lyrics-toggle {
     position: absolute;
-    top: 1rem;
-    right: 4.5rem;
+    bottom: 8rem;
+    left: 50%;
+    transform: translateX(-50%);
     background: rgb(0, 0, 0, 0.5);
     border: none;
     color: white;
@@ -3673,9 +3656,7 @@ img[src=''] {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition:
-        all 0.2s ease,
-        right 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .fullscreen-lyrics-toggle:hover {
