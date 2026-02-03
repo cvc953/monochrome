@@ -708,6 +708,7 @@ export class UIRenderer {
         const overlay = document.getElementById('fullscreen-cover-overlay');
         const nextTrackEl = document.getElementById('fullscreen-next-track');
         const lyricsToggleBtn = document.getElementById('toggle-fullscreen-lyrics-btn');
+        const closeBtn = document.getElementById('close-fullscreen-cover-btn');
 
         this.updateFullscreenMetadata(track, nextTrack);
 
@@ -717,6 +718,19 @@ export class UIRenderer {
             nextTrackEl.classList.add('animate-in');
         } else {
             nextTrackEl.classList.remove('animate-in');
+        }
+
+        // Clone close button to remove old listeners
+        if (closeBtn) {
+            const newCloseBtn = closeBtn.cloneNode(true);
+            closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+            newCloseBtn.addEventListener('click', () => {
+                if (window.location.hash === '#fullscreen') {
+                    window.history.back();
+                } else {
+                    this.closeFullscreenCover();
+                }
+            });
         }
 
         if (lyricsManager && audioPlayer) {
@@ -1619,10 +1633,10 @@ export class UIRenderer {
                     dateDisplay =
                         window.innerWidth > 768
                             ? releaseDate.toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                              })
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })
                             : year;
                 }
             }
@@ -2356,9 +2370,9 @@ export class UIRenderer {
                 <span>${artist.popularity}% popularity</span>
                 <div class="artist-tags">
                     ${(artist.artistRoles || [])
-                        .filter((role) => role.category)
-                        .map((role) => `<span class="artist-tag">${role.category}</span>`)
-                        .join('')}
+                    .filter((role) => role.category)
+                    .map((role) => `<span class="artist-tag">${role.category}</span>`)
+                    .join('')}
                 </div>
             `;
 
