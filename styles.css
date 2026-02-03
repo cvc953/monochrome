@@ -2269,6 +2269,7 @@ input:checked+.toggle-switch:hover .slider::before {
     z-index: 1;
     max-width: 90%;
     width: 90%;
+    min-width: 0;
     margin-left: auto;
     margin-right: auto;
     background-color: color-mix(in srgb, var(--card) 40%, transparent);
@@ -2279,6 +2280,7 @@ input:checked+.toggle-switch:hover .slider::before {
     box-shadow: 0 8px 32px rgb(0, 0, 0, 0.4);
     overflow: hidden;
     max-height: 200px;
+    flex-shrink: 0;
 }
 
 #fullscreen-track-title {
