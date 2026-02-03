@@ -19,6 +19,7 @@
     --radius-full: 9999px;
     --player-bar-height-desktop: 90px;
     --player-bar-height-mobile: 130px;
+    --header-control-height: 44px;
     --safe-area-top: env(safe-area-inset-top);
     --safe-area-bottom: env(safe-area-inset-bottom);
 
@@ -579,8 +580,13 @@ kbd {
     border: none;
     color: var(--foreground);
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0;
+    width: var(--header-control-height);
+    height: var(--header-control-height);
     border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: background-color var(--transition);
 }
 
@@ -598,7 +604,8 @@ kbd {
 
 .search-bar input {
     width: 100%;
-    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+    height: var(--header-control-height);
+    padding: 0 0.75rem 0 2.5rem;
     background-color: var(--input);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -4076,13 +4083,12 @@ img[src=''] {
     }
 
     .hamburger-menu {
-        order: 3;
-        width: 10;
+        order: 1;
     }
 
     .search-bar {
         order: 3;
-        width: 90%;
+        width: 100%;
     }
 
     .sidebar {
