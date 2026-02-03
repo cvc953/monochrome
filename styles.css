@@ -2435,11 +2435,16 @@ input:checked+.toggle-switch:hover .slider::before {
 .fullscreen-buttons #fs-play-pause-btn {
     width: 64px;
     height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+    flex: 0 0 64px;
+    aspect-ratio: 1 / 1;
     background: var(--foreground);
     color: var(--background);
-    border-radius: 50%;
+    border-radius: 9999px;
     padding: 0;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 .fullscreen-buttons #fs-play-pause-btn:hover {
