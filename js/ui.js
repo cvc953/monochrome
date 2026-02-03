@@ -708,7 +708,6 @@ export class UIRenderer {
         const overlay = document.getElementById('fullscreen-cover-overlay');
         const nextTrackEl = document.getElementById('fullscreen-next-track');
         const lyricsToggleBtn = document.getElementById('toggle-fullscreen-lyrics-btn');
-        const closeBtn = document.getElementById('close-fullscreen-cover-btn');
 
         this.updateFullscreenMetadata(track, nextTrack);
 
@@ -718,19 +717,6 @@ export class UIRenderer {
             nextTrackEl.classList.add('animate-in');
         } else {
             nextTrackEl.classList.remove('animate-in');
-        }
-
-        // Clone close button to remove old listeners
-        if (closeBtn) {
-            const newCloseBtn = closeBtn.cloneNode(true);
-            closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
-            newCloseBtn.addEventListener('click', () => {
-                if (window.location.hash === '#fullscreen') {
-                    window.history.back();
-                } else {
-                    this.closeFullscreenCover();
-                }
-            });
         }
 
         if (lyricsManager && audioPlayer) {
