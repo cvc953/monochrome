@@ -2288,25 +2288,25 @@ input:checked+.toggle-switch:hover .slider::before {
     color: var(--foreground);
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    max-width: 25ch;
     width: 100%;
     min-width: 0;
     display: block;
     position: relative;
+    animation: marquee-auto 20s linear infinite;
 }
 
 #fullscreen-track-title:hover {
-    animation: marquee 10s linear infinite;
+    animation: marquee-auto 20s linear infinite;
 }
 
-@keyframes marquee {
+@keyframes marquee-auto {
     0% {
         transform: translateX(0);
     }
 
     100% {
-        transform: translateX(calc(-100% + 90vw));
+        transform: translateX(-100%);
     }
 }
 
