@@ -621,7 +621,7 @@ kbd {
         box-shadow var(--transition-fast),
         border-color var(--transition-fast),
         background-color var(--transition-fast);
-}}
+}
 
 .search-bar input:focus {
     outline: none;
