@@ -75,23 +75,27 @@ export function initializeUIInteractions(player, api, ui) {
     let draggedQueueIndex = null;
 
     // Sidebar mobile
-    hamburgerBtn.addEventListener('click', () => {
-        sidebar.classList.add('is-open');
-        sidebarOverlay.classList.add('is-visible');
-    });
-
+    const canToggleSidebar = !!(hamburgerBtn && sidebar && sidebarOverlay);
     const closeSidebar = () => {
+        if (!sidebar || !sidebarOverlay) return;
         sidebar.classList.remove('is-open');
         sidebarOverlay.classList.remove('is-visible');
     };
 
-    sidebarOverlay.addEventListener('click', closeSidebar);
+    if (canToggleSidebar) {
+        hamburgerBtn.addEventListener('click', () => {
+            sidebar.classList.add('is-open');
+            sidebarOverlay.classList.add('is-visible');
+        });
 
-    sidebar.addEventListener('click', (e) => {
-        if (e.target.closest('a')) {
-            closeSidebar();
-        }
-    });
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        sidebar.addEventListener('click', (e) => {
+            if (e.target.closest('a')) {
+                closeSidebar();
+            }
+        });
+    }
 
     // Queue panel
     const renderQueueControls = (container) => {
@@ -178,12 +182,12 @@ export function initializeUIInteractions(player, api, ui) {
                         <h3>Add Queue to Playlist</h3>
                         <div class="modal-list">
                             ${playlists
-                                .map(
-                                    (p) => `
+                        .map(
+                            (p) => `
                                 <div class="modal-option" data-id="${p.id}">${escapeHtml(p.name)}</div>
                             `
-                                )
-                                .join('')}
+                        )
+                        .join('')}
                         </div>
                         <div class="modal-actions">
                             <button class="btn-secondary cancel-btn">Cancel</button>
