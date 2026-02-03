@@ -3645,7 +3645,7 @@ img[src=''] {
     background: rgb(0, 0, 0, 0.5);
     border: none;
     color: white;
-    padding: 0.5rem;
+    padding: 0;
     border-radius: 50%;
     cursor: pointer;
     z-index: 1001;
@@ -3653,7 +3653,6 @@ img[src=''] {
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    margin-left: 1rem;
     flex-shrink: 0;
 }
 
