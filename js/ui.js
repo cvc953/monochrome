@@ -747,17 +747,24 @@ export class UIRenderer {
         let currentDragY = 0;
         let isDragging = false;
 
-        this._fullscreenPointerDownHandler = (e) => {
-            touchStartY = e.clientY || e.pageY;
+        const getClientY = (e) => {
+            if (e.touches && e.touches.length > 0) {
+                return e.touches[0].clientY;
+            }
+            return e.clientY || e.pageY || 0;
+        };
+
+        this._fullscreenTouchStartHandler = (e) => {
+            touchStartY = getClientY(e);
             isDragging = true;
             currentDragY = 0;
             overlay.style.transition = 'none'; // Remove transition during drag
         };
 
-        this._fullscreenPointerMoveHandler = (e) => {
+        this._fullscreenTouchMoveHandler = (e) => {
             if (!isDragging) return;
 
-            const currentY = e.clientY || e.pageY;
+            const currentY = getClientY(e);
             currentDragY = Math.max(0, currentY - touchStartY);
 
             // Apply translateY effect for visual feedback
@@ -767,7 +774,7 @@ export class UIRenderer {
             }
         };
 
-        this._fullscreenPointerUpHandler = (e) => {
+        this._fullscreenTouchEndHandler = (e) => {
             if (!isDragging) return;
             isDragging = false;
 
@@ -788,9 +795,15 @@ export class UIRenderer {
             }
         };
 
-        document.addEventListener('pointerdown', this._fullscreenPointerDownHandler);
-        document.addEventListener('pointermove', this._fullscreenPointerMoveHandler);
-        document.addEventListener('pointerup', this._fullscreenPointerUpHandler);
+        // Use touch events for better Android compatibility
+        document.addEventListener('touchstart', this._fullscreenTouchStartHandler, { passive: false });
+        document.addEventListener('touchmove', this._fullscreenTouchMoveHandler, { passive: false });
+        document.addEventListener('touchend', this._fullscreenTouchEndHandler, { passive: false });
+
+        // Also support pointer/mouse events for desktop
+        document.addEventListener('pointerdown', this._fullscreenTouchStartHandler);
+        document.addEventListener('pointermove', this._fullscreenTouchMoveHandler);
+        document.addEventListener('pointerup', this._fullscreenTouchEndHandler);
 
         const startVisualizer = () => {
             if (!visualizerSettings.isEnabled()) {
@@ -838,10 +851,13 @@ export class UIRenderer {
         const overlay = document.getElementById('fullscreen-cover-overlay');
         overlay.style.display = 'none';
 
-        // Remove all pointer event listeners
-        document.removeEventListener('pointerdown', this._fullscreenPointerDownHandler);
-        document.removeEventListener('pointermove', this._fullscreenPointerMoveHandler);
-        document.removeEventListener('pointerup', this._fullscreenPointerUpHandler);
+        // Remove all touch and pointer event listeners
+        document.removeEventListener('touchstart', this._fullscreenTouchStartHandler, { passive: false });
+        document.removeEventListener('touchmove', this._fullscreenTouchMoveHandler, { passive: false });
+        document.removeEventListener('touchend', this._fullscreenTouchEndHandler, { passive: false });
+        document.removeEventListener('pointerdown', this._fullscreenTouchStartHandler);
+        document.removeEventListener('pointermove', this._fullscreenTouchMoveHandler);
+        document.removeEventListener('pointerup', this._fullscreenTouchEndHandler);
 
         const playerBar = document.querySelector('.now-playing-bar');
         if (playerBar) playerBar.style.removeProperty('display');
