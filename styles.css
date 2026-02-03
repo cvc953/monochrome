@@ -2452,6 +2452,11 @@ input:checked+.toggle-switch:hover .slider::before {
     display: block;
 }
 
+.fullscreen-buttons #fs-play-pause-btn svg polygon {
+    transform: translateX(1px);
+    transform-origin: center;
+}
+
 .fullscreen-buttons #fs-play-pause-btn:hover {
     transform: scale(1.05);
     background: var(--foreground);
