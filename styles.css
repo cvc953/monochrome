@@ -3642,23 +3642,23 @@ img[src=''] {
 }
 
 .fullscreen-lyrics-toggle {
-    background: rgb(0, 0, 0, 0.5);
+    background: transparent;
     border: none;
-    color: white;
-    padding: 0;
-    border-radius: 50%;
+    color: var(--muted-foreground);
+    padding: 0.5rem;
+    border-radius: var(--radius);
     cursor: pointer;
     z-index: 1001;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all var(--transition);
     flex-shrink: 0;
 }
 
 .fullscreen-lyrics-toggle:hover {
-    background: rgb(0, 0, 0, 0.7);
-    transform: scale(1.1);
+    background: var(--secondary);
+    color: var(--foreground);
 }
 
 .fullscreen-lyrics-toggle.active {
