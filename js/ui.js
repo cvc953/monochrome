@@ -743,26 +743,35 @@ export class UIRenderer {
         overlay.style.display = 'flex';
 
         // Add scroll down to close functionality with animation
-        let startScrollY = 0;
-        let scrollVelocity = 0;
+        let touchStartY = 0;
+        let currentDragY = 0;
+        let isDragging = false;
 
-        this._fullscreenWheelStartHandler = (e) => {
-            startScrollY = window.scrollY || document.documentElement.scrollTop;
+        this._fullscreenPointerDownHandler = (e) => {
+            touchStartY = e.clientY || e.pageY;
+            isDragging = true;
+            currentDragY = 0;
+            overlay.style.transition = 'none'; // Remove transition during drag
         };
 
-        this._fullscreenScrollHandler = () => {
-            const currentScrollY = window.scrollY || document.documentElement.scrollTop;
-            scrollVelocity = currentScrollY - startScrollY;
+        this._fullscreenPointerMoveHandler = (e) => {
+            if (!isDragging) return;
+
+            const currentY = e.clientY || e.pageY;
+            currentDragY = Math.max(0, currentY - touchStartY);
 
             // Apply translateY effect for visual feedback
-            if (scrollVelocity > 0) {
-                overlay.style.transform = `translateY(${Math.min(scrollVelocity, 200)}px)`;
-                overlay.style.opacity = Math.max(0.7, 1 - scrollVelocity / 400);
+            if (currentDragY > 0) {
+                overlay.style.transform = `translateY(${Math.min(currentDragY, 200)}px)`;
+                overlay.style.opacity = Math.max(0.7, 1 - currentDragY / 400);
             }
         };
 
-        this._fullscreenWheelEndHandler = () => {
-            if (scrollVelocity > 80) {
+        this._fullscreenPointerUpHandler = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+
+            if (currentDragY > 80) {
                 // Close with animation
                 overlay.style.transition = 'all 0.3s ease-out';
                 overlay.style.transform = 'translateY(100%)';
@@ -779,33 +788,9 @@ export class UIRenderer {
             }
         };
 
-        this._fullscreenTouchStartHandler = (e) => {
-            startScrollY = window.scrollY || document.documentElement.scrollTop;
-        };
-
-        this._fullscreenTouchEndHandler = () => {
-            if (scrollVelocity > 80) {
-                // Close with animation
-                overlay.style.transition = 'all 0.3s ease-out';
-                overlay.style.transform = 'translateY(100%)';
-                overlay.style.opacity = '0';
-
-                setTimeout(() => {
-                    this.closeFullscreenCover();
-                }, 300);
-            } else {
-                // Reset animation
-                overlay.style.transition = 'all 0.2s ease-out';
-                overlay.style.transform = 'translateY(0)';
-                overlay.style.opacity = '1';
-            }
-        };
-
-        document.addEventListener('wheel', this._fullscreenWheelStartHandler);
-        document.addEventListener('touchstart', this._fullscreenTouchStartHandler);
-        document.addEventListener('scroll', this._fullscreenScrollHandler, true);
-        document.addEventListener('touchend', this._fullscreenTouchEndHandler);
-        document.addEventListener('wheel', this._fullscreenWheelEndHandler);
+        document.addEventListener('pointerdown', this._fullscreenPointerDownHandler);
+        document.addEventListener('pointermove', this._fullscreenPointerMoveHandler);
+        document.addEventListener('pointerup', this._fullscreenPointerUpHandler);
 
         const startVisualizer = () => {
             if (!visualizerSettings.isEnabled()) {
@@ -853,12 +838,10 @@ export class UIRenderer {
         const overlay = document.getElementById('fullscreen-cover-overlay');
         overlay.style.display = 'none';
 
-        // Remove all scroll/touch event listeners
-        document.removeEventListener('wheel', this._fullscreenWheelStartHandler);
-        document.removeEventListener('wheel', this._fullscreenWheelEndHandler);
-        document.removeEventListener('touchstart', this._fullscreenTouchStartHandler);
-        document.removeEventListener('touchend', this._fullscreenTouchEndHandler);
-        document.removeEventListener('scroll', this._fullscreenScrollHandler, true);
+        // Remove all pointer event listeners
+        document.removeEventListener('pointerdown', this._fullscreenPointerDownHandler);
+        document.removeEventListener('pointermove', this._fullscreenPointerMoveHandler);
+        document.removeEventListener('pointerup', this._fullscreenPointerUpHandler);
 
         const playerBar = document.querySelector('.now-playing-bar');
         if (playerBar) playerBar.style.removeProperty('display');
