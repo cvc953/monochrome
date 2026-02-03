@@ -4693,6 +4693,29 @@ img[src=''] {
         justify-content: space-between;
         width: 100%;
     }
+
+    #fullscreen-cover-image {
+        max-height: 80vh;
+    }
+
+    .fullscreen-track-info {
+        max-height: 280px;
+        padding: 1.5rem 2rem;
+    }
+}
+
+@media (max-height: 700px) {
+    #fullscreen-cover-image {
+        max-height: 75vh;
+    }
+
+    .fullscreen-track-info {
+        max-height: 280px;
+    }
+
+    .fullscreen-main-view {
+        padding: 0.5rem 2rem 1rem;
+    }
 }
 
 /* stylelint-disable-next-line media-feature-name-value-no-unknown */
