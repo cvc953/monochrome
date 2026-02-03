@@ -2445,6 +2445,11 @@ input:checked+.toggle-switch:hover .slider::before {
     padding: 0;
     box-sizing: border-box;
     overflow: hidden;
+    line-height: 0;
+}
+
+.fullscreen-buttons #fs-play-pause-btn svg {
+    display: block;
 }
 
 .fullscreen-buttons #fs-play-pause-btn:hover {
