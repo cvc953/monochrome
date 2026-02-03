@@ -762,8 +762,8 @@ export class UIRenderer {
 
             // Apply translateY effect for visual feedback
             if (currentDragY > 0) {
-                overlay.style.transform = `translateY(${Math.min(currentDragY, 200)}px)`;
-                overlay.style.opacity = Math.max(0.7, 1 - currentDragY / 400);
+                overlay.style.transform = `translateY(${Math.min(currentDragY, 500)}px)`;
+                overlay.style.opacity = '1';
             }
         };
 
