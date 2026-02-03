@@ -2256,9 +2256,9 @@ input:checked+.toggle-switch:hover .slider::before {
 }
 
 #fullscreen-cover-image {
-    max-width: 80%;
-    width: 80%;
-    max-height: 40vh;
+    max-width: 90%;
+    width: 90%;
+    max-height: 60vh;
     border-radius: var(--radius);
     box-shadow: 0 20px 50px rgb(0, 0, 0, 0.5);
     object-fit: contain;
