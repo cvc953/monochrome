@@ -14,7 +14,7 @@
         "lint": "npm run lint:js && npm run lint:css && npm run lint:html",
         "format": "prettier --write .",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "android:build": "npm run build && npx cap sync android",
+        "android:build": "npm run build && npx cap sync android && cd android && ./gradlew --stop && cd ..",
         "android:open": "npx cap open android",
         "android:run": "npm run android:build && npx cap run android"
     },
@@ -30,6 +30,7 @@
     },
     "homepage": "https://github.com/SamidyFR/monochrome#readme",
     "devDependencies": {
+        "@react-native-community/cli": "latest",
         "eslint": "^9.39.2",
         "eslint-config-prettier": "^10.1.8",
         "globals": "^17.0.0",
