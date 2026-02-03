@@ -535,6 +535,7 @@ kbd {
     gap: var(--spacing-md);
     position: relative;
     z-index: 1000;
+    height: var(--header-control-height);
 }
 
 .navigation-controls {
@@ -588,6 +589,7 @@ kbd {
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
     transition: background-color var(--transition);
 }
 
@@ -601,6 +603,7 @@ kbd {
     max-width: 100%;
     display: flex;
     align-items: center;
+    height: var(--header-control-height);
 }
 
 .search-bar input {
