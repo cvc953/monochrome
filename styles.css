@@ -2249,8 +2249,9 @@ input:checked+.toggle-switch:hover .slider::before {
 }
 
 #fullscreen-cover-image {
-    max-width: 55vw;
-    max-height: 45vh;
+    max-width: 90%;
+    width: 90%;
+    max-height: 55vh;
     border-radius: var(--radius);
     box-shadow: 0 20px 50px rgb(0, 0, 0, 0.5);
     object-fit: contain;
@@ -2271,6 +2272,7 @@ input:checked+.toggle-switch:hover .slider::before {
     border-radius: var(--radius);
     border: 1px solid var(--border);
     box-shadow: 0 8px 32px rgb(0, 0, 0, 0.4);
+    overflow: hidden;
 }
 
 #fullscreen-track-title {
@@ -2280,6 +2282,11 @@ input:checked+.toggle-switch:hover .slider::before {
     color: var(--foreground);
     white-space: nowrap;
     overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;
+    display: block;
     position: relative;
 }
 
@@ -2301,6 +2308,13 @@ input:checked+.toggle-switch:hover .slider::before {
     font-size: 1.25rem;
     color: color-mix(in srgb, var(--foreground), transparent 40%);
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;
+    display: block;
     transition:
         color 0.2s,
         text-decoration 0.2s;
@@ -4089,7 +4103,7 @@ img[src=''] {
     }
 
     #fullscreen-cover-image {
-        max-height: 45vh;
+        max-height: 55vh;
 
         /* Reduce height on mobile to fit text */
         margin-bottom: 1.5rem;

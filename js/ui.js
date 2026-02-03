@@ -958,25 +958,37 @@ export class UIRenderer {
         }
 
         // Fullscreen volume controls
-        const fsVolumeBtn = document.getElementById('fs-volume-btn');
+        const fsVolumeDownBtn = document.getElementById('fs-volume-down-btn');
+        const fsVolumeUpBtn = document.getElementById('fs-volume-up-btn');
         const fsVolumeBar = document.getElementById('fs-volume-bar');
         const fsVolumeFill = document.getElementById('fs-volume-fill');
 
-        if (fsVolumeBtn && fsVolumeBar && fsVolumeFill) {
+        if (fsVolumeDownBtn && fsVolumeUpBtn && fsVolumeBar && fsVolumeFill) {
             const updateFsVolumeUI = () => {
                 const { muted } = audioPlayer;
                 const volume = this.player.userVolume;
-                fsVolumeBtn.innerHTML = muted || volume === 0 ? SVG_MUTE : SVG_VOLUME;
-                fsVolumeBtn.classList.toggle('muted', muted || volume === 0);
                 const effectiveVolume = muted ? 0 : volume * 100;
                 fsVolumeFill.style.setProperty('--fs-volume-level', `${effectiveVolume}%`);
                 fsVolumeFill.style.width = `${effectiveVolume}%`;
             };
 
-            fsVolumeBtn.onclick = () => {
-                audioPlayer.muted = !audioPlayer.muted;
-                localStorage.setItem('muted', audioPlayer.muted);
+            const adjustFsVolume = (delta) => {
+                const currentVolume = this.player.userVolume;
+                const newVolume = Math.max(0, Math.min(1, currentVolume + delta));
+                this.player.setVolume(newVolume);
+                if (audioPlayer.muted && newVolume > 0) {
+                    audioPlayer.muted = false;
+                    localStorage.setItem('muted', false);
+                }
                 updateFsVolumeUI();
+            };
+
+            fsVolumeDownBtn.onclick = () => {
+                adjustFsVolume(-0.1);
+            };
+
+            fsVolumeUpBtn.onclick = () => {
+                adjustFsVolume(0.1);
             };
 
             const setFsVolume = (e) => {
