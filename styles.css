@@ -2015,7 +2015,7 @@ input:checked+.toggle-switch:hover .slider::before {
     display: none;
 }
 
-/*.volume-controls {
+.volume-controls {
     display: flex;
     justify-content: center !important;
     align-items: flex-end !important;
@@ -2088,7 +2088,7 @@ input:checked+.toggle-switch:hover .slider::before {
     background-color: var(--highlight);
     border-radius: 50%;
     box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
-}*/
+}
 
 /* Sleep Timer Button */
 #sleep-timer-btn {
@@ -4524,7 +4524,7 @@ img[src=''] {
         height: 18px;
     }
 
-    /*    .volume-controls button {
+    .volume-controls button {
         padding: 0.25rem;
         min-width: 28px;
         min-height: 28px;
@@ -4533,7 +4533,7 @@ img[src=''] {
     .volume-controls button svg {
         width: 16px;
         height: 16px;
-    }*/
+    }
 
     .track-item {
         grid-template-columns: 32px 1fr 40px auto;
