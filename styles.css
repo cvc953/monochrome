@@ -4023,6 +4023,7 @@ img[src=''] {
         max-width: none;
         font-size: 0.75rem;
         gap: 0.5rem;
+        visibility: hidden;
     }
 
     #fullscreen-cover-overlay {
@@ -4232,12 +4233,13 @@ img[src=''] {
         font-size: 0.75rem;
     }
 
-    /*    .now-playing-bar .volume-controls {
+    .now-playing-bar .volume-controls {
         grid-area: controls;
         display: flex;
         gap: 0.25rem;
         justify-content: flex-end;
-    }*/
+        visibility: hidden;
+    }
 
     .now-playing-bar .player-controls {
         grid-area: progress;
