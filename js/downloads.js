@@ -19,7 +19,44 @@ import { saveBlobToDevice } from './native-download.js';
 const downloadTasks = new Map();
 const bulkDownloadTasks = new Map();
 const ongoingDownloads = new Set();
+const completedDownloads = [];
 let downloadNotificationContainer = null;
+
+function updateDownloadsPage() {
+    const activeList = document.getElementById('downloads-active-list');
+    const completedList = document.getElementById('downloads-completed-list');
+
+    if (!activeList || !completedList) return;
+
+    // Update active downloads
+    if (downloadTasks.size === 0) {
+        activeList.innerHTML = '<p style="text-align: center; color: var(--muted-foreground); padding: 2rem;">No active downloads</p>';
+    } else {
+        activeList.innerHTML = '';
+        downloadTasks.forEach((task, trackId) => {
+            const clone = task.taskEl.cloneNode(true);
+            // Re-attach cancel button event
+            const cancelBtn = clone.querySelector('.download-cancel');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    task.abortController.abort();
+                    removeDownloadTask(trackId);
+                });
+            }
+            activeList.appendChild(clone);
+        });
+    }
+
+    // Update completed downloads
+    if (completedDownloads.length === 0) {
+        completedList.innerHTML = '<p style="text-align: center; color: var(--muted-foreground); padding: 2rem;">No completed downloads</p>';
+    } else {
+        completedList.innerHTML = '';
+        completedDownloads.slice(-10).reverse().forEach((item) => {
+            completedList.appendChild(item.cloneNode(true));
+        });
+    }
+}
 
 async function loadClientZip() {
     try {
@@ -69,6 +106,10 @@ export function addDownloadTask(trackId, track, filename, api, abortController) 
     taskEl.dataset.trackId = trackId;
     const trackTitle = getTrackTitle(track);
     const trackArtists = getTrackArtists(track);
+
+    // Show quick notification that download started
+    showNotification(`⬇️ Download started: ${trackTitle}`);
+
     taskEl.innerHTML = `
         <div style="display: flex; align-items: start; gap: 0.75rem;">
             <img src="${api.getCoverUrl(track.album?.cover)}"
@@ -87,14 +128,17 @@ export function addDownloadTask(trackId, track, filename, api, abortController) 
         </div>
     `;
 
-    container.appendChild(taskEl);
+    // Don't append to notification container, only track in memory for downloads page
+    // container.appendChild(taskEl);
 
-    downloadTasks.set(trackId, { taskEl, abortController });
+    downloadTasks.set(trackId, { taskEl, abortController, track, filename });
 
     taskEl.querySelector('.download-cancel').addEventListener('click', () => {
         abortController.abort();
         removeDownloadTask(trackId);
     });
+
+    updateDownloadsPage();
 
     return { taskEl, abortController };
 }
@@ -117,6 +161,8 @@ export function updateDownloadProgress(trackId, progress) {
 
         statusEl.textContent = `Downloading: ${receivedMB}MB / ${totalMB}MB (${percent}%)`;
     }
+
+    updateDownloadsPage();
 }
 
 export function completeDownloadTask(trackId, success = true, message = null) {
@@ -135,6 +181,11 @@ export function completeDownloadTask(trackId, success = true, message = null) {
         statusEl.style.color = '#10b981';
         cancelBtn.remove();
 
+        // Add to completed downloads
+        const completedEl = taskEl.cloneNode(true);
+        completedDownloads.push(completedEl);
+        if (completedDownloads.length > 50) completedDownloads.shift();
+
         setTimeout(() => removeDownloadTask(trackId), 3000);
     } else {
         progressFill.style.background = '#ef4444';
@@ -147,6 +198,8 @@ export function completeDownloadTask(trackId, success = true, message = null) {
 
         setTimeout(() => removeDownloadTask(trackId), 5000);
     }
+
+    updateDownloadsPage();
 }
 
 function removeDownloadTask(trackId) {
@@ -159,6 +212,7 @@ function removeDownloadTask(trackId) {
     setTimeout(() => {
         taskEl.remove();
         downloadTasks.delete(trackId);
+        updateDownloadsPage();
 
         if (downloadNotificationContainer && downloadNotificationContainer.children.length === 0) {
             downloadNotificationContainer.remove();
@@ -687,12 +741,12 @@ function createBulkDownloadNotification(type, name, _totalItems) {
         type === 'album'
             ? 'Album'
             : type === 'playlist'
-              ? 'Playlist'
-              : type === 'liked'
-                ? 'Liked Tracks'
-                : type === 'queue'
-                  ? 'Queue'
-                  : 'Discography';
+                ? 'Playlist'
+                : type === 'liked'
+                    ? 'Liked Tracks'
+                    : type === 'queue'
+                        ? 'Queue'
+                        : 'Discography';
 
     notifEl.innerHTML = `
         <div style="display: flex; align-items: start; gap: 0.75rem;">

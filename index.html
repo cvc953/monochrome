@@ -647,6 +647,18 @@
                 <nav class="sidebar-nav">
                     <ul>
                         <li class="nav-item">
+                            <a href="/downloads-progress">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="7 10 12 15 17 10" />
+                                    <line x1="12" x2="12" y1="15" y2="3" />
+                                </svg>
+                                <span>Downloads</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a href="/about">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -1926,6 +1938,19 @@
                             <ul id="api-instance-list"></ul>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div id="page-downloads-progress" class="page">
+                <h2 class="section-title">Downloads in Progress</h2>
+                <div id="downloads-active-list" class="downloads-list">
+                    <p style="text-align: center; color: var(--muted-foreground); padding: 2rem;">No active downloads
+                    </p>
+                </div>
+                <h3 class="section-title" style="margin-top: 2rem; font-size: 1.25rem;">Completed Downloads</h3>
+                <div id="downloads-completed-list" class="downloads-list">
+                    <p style="text-align: center; color: var(--muted-foreground); padding: 2rem;">No completed downloads
+                    </p>
                 </div>
             </div>
 

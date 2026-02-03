@@ -359,6 +359,7 @@ kbd {
     grid-area: main;
     overflow-y: auto;
     padding: var(--spacing-xl);
+    padding-top: calc(var(--spacing-xl) + 40px);
     scroll-behavior: smooth;
     position: relative;
 
@@ -2333,7 +2334,7 @@ input:checked+.toggle-switch:hover .slider::before {
     margin-top: 1rem;
     font-size: 0.9rem;
     color: color-mix(in srgb, var(--foreground), transparent 40%);
-    display: flex;
+    display: none !important;
     flex-direction: column;
     gap: 0.2rem;
     opacity: 0;
@@ -3088,6 +3089,10 @@ input:checked+.toggle-switch:hover .slider::before {
     gap: 0.5rem;
 }
 
+#download-notifications:empty {
+    display: none;
+}
+
 .download-task {
     background: var(--card);
     border: 1px solid var(--border);
@@ -3101,6 +3106,16 @@ input:checked+.toggle-switch:hover .slider::before {
 .download-cancel:hover {
     background: var(--secondary) !important;
     color: var(--foreground) !important;
+}
+
+.downloads-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.downloads-list .download-task {
+    animation: none;
 }
 
 #lastfm-controls {
