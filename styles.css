@@ -2319,7 +2319,7 @@ input:checked+.toggle-switch:hover .slider::before {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100%;
+    max-width: 40ch;
     width: 100%;
     min-width: 0;
     display: block;
