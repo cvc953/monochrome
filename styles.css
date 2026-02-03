@@ -359,7 +359,7 @@ kbd {
     grid-area: main;
     overflow-y: auto;
     padding: var(--spacing-xl);
-    padding-top: calc(var(--spacing-xl) + 40px);
+    padding-top: calc(var(--spacing-xl) + 80px);
     scroll-behavior: smooth;
     position: relative;
 
@@ -4163,9 +4163,9 @@ img[src=''] {
 
     .sidebar {
         position: fixed;
-        top: 0;
+        top: 60px;
         left: 0;
-        height: 100%;
+        height: calc(100% - 60px);
         transform: translateX(-100%);
         z-index: 2200;
         transition:
