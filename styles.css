@@ -4076,12 +4076,13 @@ img[src=''] {
     }
 
     .hamburger-menu {
-        order: 1;
+        order: 3;
+        width: 10;
     }
 
     .search-bar {
         order: 3;
-        width: 100%;
+        width: 90%;
     }
 
     .sidebar {
