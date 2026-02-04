@@ -16,7 +16,7 @@ import org.json.JSONException
 
 @CapacitorPlugin(name = "LocalMusic")
 class LocalMusicPlugin : Plugin() {
-    private val AUDIO_EXTENSIONS = setOf("flac", "mp3", "m4a", "wav", "ogg", "aac")
+    private val AUDIO_EXTENSIONS = setOf("flac", "mp3", "m4a", "wav", "aac")
     private val REQUEST_CODE_DIRECTORY = 1001
     private var pendingCall: PluginCall? = null
 
