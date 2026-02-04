@@ -1287,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const btn = document.getElementById('select-local-folder-btn');
             const btnText = document.getElementById('select-local-folder-text');
-            
+
             try {
                 if (btn) {
                     if (btnText) btnText.textContent = 'Loading...';
