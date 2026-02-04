@@ -1,6 +1,5 @@
 package com.monochrome.app
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
@@ -11,10 +10,9 @@ import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
+import java.io.File
 import org.json.JSONArray
 import org.json.JSONException
-import org.json.JSONObject
-import java.io.File
 
 @CapacitorPlugin(name = "LocalMusic")
 class LocalMusicPlugin : Plugin() {
@@ -24,8 +22,9 @@ class LocalMusicPlugin : Plugin() {
 
     @PluginMethod
     fun scanMusicDirectory(call: PluginCall) {
-        val musicDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "")
-        
+        val musicDir =
+                File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "")
+
         if (!musicDir.exists()) {
             call.reject("Music directory not found")
             return
@@ -34,7 +33,7 @@ class LocalMusicPlugin : Plugin() {
         try {
             val files = mutableListOf<JSObject>()
             scanDirectory(musicDir, files)
-            
+
             val result = JSObject()
             result.put("files", JSONArray(files))
             call.resolve(result)
@@ -47,9 +46,10 @@ class LocalMusicPlugin : Plugin() {
     @PluginMethod
     fun pickMusicFolder(call: PluginCall) {
         pendingCall = call
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+        val intent =
+                Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
         startActivityForResult(intent, REQUEST_CODE_DIRECTORY)
     }
 
@@ -71,7 +71,7 @@ class LocalMusicPlugin : Plugin() {
             val bytes = file.readBytes()
             // Convert to base64 for JSON transfer
             val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-            
+
             val result = JSObject()
             result.put("data", base64)
             result.put("size", bytes.size)
@@ -121,7 +121,7 @@ class LocalMusicPlugin : Plugin() {
                     if (path != null) {
                         val files = mutableListOf<JSObject>()
                         scanDirectory(File(path), files)
-                        
+
                         val result = JSObject()
                         result.put("files", JSONArray(files))
                         result.put("path", path)

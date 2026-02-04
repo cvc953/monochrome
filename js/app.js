@@ -1230,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isAndroid && window.Capacitor) {
                 try {
                     const { LocalMusic } = window.Capacitor.Plugins;
-                    
+
                     const btn = document.getElementById('select-local-folder-btn');
                     const btnText = document.getElementById('select-local-folder-text');
                     if (btn) {
@@ -1248,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         console.log('Folder picker failed, scanning default Music directory...');
                         result = await LocalMusic.scanMusicDirectory();
                     }
-                    
+
                     const filesData = result.files;
 
                     if (!filesData || filesData.length === 0) {
@@ -1263,14 +1263,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         try {
                             // Read file bytes using native plugin
                             const fileBytes = await LocalMusic.readFileBytes({ path: fileData.path });
-                            
+
                             // Convert base64 to blob
                             const binaryString = atob(fileBytes.data);
                             const bytes = new Uint8Array(binaryString.length);
                             for (let i = 0; i < binaryString.length; i++) {
                                 bytes[i] = binaryString.charCodeAt(i);
                             }
-                            
+
                             const mimeType = 'audio/' + fileData.name.split('.').pop().toLowerCase();
                             const blob = new Blob([bytes], { type: mimeType });
                             const file = new File([blob], fileData.name, { type: mimeType });
