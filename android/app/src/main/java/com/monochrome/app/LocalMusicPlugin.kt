@@ -50,7 +50,15 @@ class LocalMusicPlugin : Plugin() {
         pendingCall = call
         val intent =
                 Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    // Request read, write and persistable URI permissions so the app can
+                    // keep access to the selected folder across reboots and sessions.
+                    addFlags(
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                                    Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION
+                    )
+                    // Let system show the entire storage roots picker on supported devices
+                    putExtra("android.content.extra.SHOW_ADVANCED", true)
                 }
         startActivityForResult(intent, REQUEST_CODE_DIRECTORY)
     }
@@ -133,6 +141,18 @@ class LocalMusicPlugin : Plugin() {
             val treeUri = data.data
             if (treeUri != null) {
                 try {
+                    try {
+                        // Persist permission so the app can access the URI later without
+                        // asking the user again.
+                        val resolver = context.contentResolver
+                        resolver.takePersistableUriPermission(
+                                treeUri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                        )
+                    } catch (permEx: Exception) {
+                        Log.w("LocalMusic", "Could not take persistable permission", permEx)
+                    }
                     val path = getPathFromUri(treeUri)
                     val files = mutableListOf<JSObject>()
 
