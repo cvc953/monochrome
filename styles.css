@@ -3558,9 +3558,21 @@ input:checked+.toggle-switch:hover .slider::before {
 
 /* Window Controls Overlay */
 
+.now-playing-bar .artist {
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
 .now-playing-bar .artist .artist-link {
     cursor: pointer;
     transition: color var(--transition);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .now-playing-bar .artist .artist-link:hover {
