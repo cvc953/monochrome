@@ -1632,6 +1632,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // Initialize Android back button support via Capacitor
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+        try {
+            const { App } = window.Capacitor.Plugins;
+            App.addListener('backButton', async () => {
+                // Just go back in history, let the normal popstate handler take care of UI updates
+                window.history.back();
+            });
+            console.log('Android back button listener initialized');
+        } catch (e) {
+            console.debug('Capacitor App plugin not available:', e);
+        }
+    }
+
     const contextMenu = document.getElementById('context-menu');
     if (contextMenu) {
         const observer = new MutationObserver((mutations) => {
