@@ -1266,6 +1266,14 @@ export class UIRenderer {
         const listContainer = document.getElementById('local-files-list');
         const selectBtnText = document.getElementById('select-local-folder-text');
 
+        // Try to load cached files first
+        if (!window.localFilesCache) {
+            const cachedFiles = await db.getSetting('local_files_cache');
+            if (cachedFiles && Array.isArray(cachedFiles)) {
+                window.localFilesCache = cachedFiles;
+            }
+        }
+
         const handle = await db.getSetting('local_folder_handle');
         if (handle) {
             if (selectBtnText) selectBtnText.textContent = `Load "${handle.name}"`;
@@ -1283,6 +1291,17 @@ export class UIRenderer {
                 if (introDiv) introDiv.style.display = 'block';
                 if (headerDiv) headerDiv.style.display = 'none';
                 if (listContainer) listContainer.innerHTML = '';
+            }
+        } else if (window.localFilesCache && window.localFilesCache.length > 0) {
+            // Show loaded files even without a saved handle (for mobile)
+            if (selectBtnText) selectBtnText.textContent = 'Select Music Folder';
+            if (introDiv) introDiv.style.display = 'none';
+            if (headerDiv) {
+                headerDiv.style.display = 'flex';
+                headerDiv.querySelector('h3').textContent = `Local Files (${window.localFilesCache.length})`;
+            }
+            if (listContainer) {
+                this.renderListWithTracks(listContainer, window.localFilesCache, false);
             }
         } else {
             if (selectBtnText) selectBtnText.textContent = 'Select Music Folder';

@@ -532,6 +532,7 @@ kbd {
     justify-content: center;
     align-items: center;
     margin-bottom: var(--spacing-xl);
+    margin-top: 1.25rem;
     gap: var(--spacing-md);
     position: relative;
     z-index: 1000;

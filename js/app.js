@@ -1299,11 +1299,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let idCounter = 0;
 
                 for (const file of files) {
-                    if (file.type.startsWith('audio/')) {
+                    const name = file.name.toLowerCase();
+                    if (
+                        name.endsWith('.flac') ||
+                        name.endsWith('.mp3') ||
+                        name.endsWith('.m4a') ||
+                        name.endsWith('.wav') ||
+                        name.endsWith('.ogg')
+                    ) {
                         const metadata = await readTrackMetadata(file);
                         metadata.id = `local-${idCounter++}-${file.name}`;
                         tracks.push(metadata);
                     }
+                }
+
+                if (tracks.length === 0) {
+                    alert('No audio files found in the selected folder.');
+                    throw new Error('No audio files found');
                 }
 
                 tracks.sort((a, b) => {
@@ -1313,15 +1325,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 window.localFilesCache = tracks;
-                await db.saveSetting('local_files_loaded', true);
+                // Store metadata without file objects (they can't be serialized)
+                const tracksToStore = tracks.map(t => ({
+                    ...t,
+                    webkitRelativePath: undefined
+                }));
+                await db.saveSetting('local_files_cache', tracksToStore);
                 ui.renderLibraryPage();
             } catch (err) {
                 console.error('Error loading files:', err);
-                alert('Failed to load files. Please try again.');
+                if (err.message !== 'No audio files found') {
+                    alert('Failed to load files. Please try again.');
+                }
             } finally {
                 if (btn) {
-                    if (btnText) btnText.textContent = 'Select Music Files';
-                    else btn.textContent = 'Select Music Files';
+                    if (btnText) btnText.textContent = 'Select Music Folder';
+                    else btn.textContent = 'Select Music Folder';
                     btn.disabled = false;
                 }
             }
