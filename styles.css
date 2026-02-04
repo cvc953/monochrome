@@ -2246,6 +2246,13 @@ input:checked+.toggle-switch:hover .slider::before {
     padding: 1rem;
 }
 
+@media (max-width: 768px) {
+    .fullscreen-cover-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
 #close-fullscreen-cover-btn {
     display: none !important;
 }
@@ -3673,6 +3680,13 @@ img[src=''] {
         flex 0.3s ease,
         padding-right 0.3s ease,
         margin-right 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .fullscreen-main-view {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
 }
 
 .fullscreen-lyrics-toggle {
