@@ -937,7 +937,7 @@
                         <div class="track-list" id="library-local-container">
                             <div id="local-files-intro" style="padding: 20px; text-align: center">
                                 <input type="file" id="mobile-music-picker" webkitdirectory mozdirectory directory
-                                    multiple style="display: none;" />
+                                    multiple accept="audio/*" style="display: none;" />
                                 <button id="select-local-folder-btn" class="btn-secondary">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2" style="margin-right: 8px">
@@ -952,8 +952,9 @@
                                     Please use Google Chrome or Microsoft Edge to play local files.
                                 </p>
                                 <p style="margin-top: 10px; font-size: 0.9rem; color: var(--muted-foreground)">
-                                    Select a folder on your device to play local files. <br />
-                                    Note: Metadata reading is basic (FLAC/MP3 tags).
+                                    Select audio files from your device to play them locally. <br />
+                                    <strong>Note:</strong> On Android, select the Music folder or individual audio
+                                    files. Metadata reading is basic (FLAC/MP3 tags).
                                 </p>
                             </div>
                             <div id="local-files-header" style="

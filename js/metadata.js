@@ -1282,7 +1282,7 @@ async function extractCoverArtFromFile(file) {
 /**
  * Extract cover from FLAC metadata blocks (METADATA_BLOCK_PICTURE)
  */
-function extractFlacCover(arrayBuffer, dataView) {
+async function extractFlacCover(arrayBuffer, dataView) {
     if (!isFlacFile(dataView)) return null;
 
     const blocks = parseFlacBlocks(dataView);
@@ -1326,12 +1326,7 @@ function extractFlacCover(arrayBuffer, dataView) {
 
         // Convert to data URL
         const blob = new Blob([imgData], { type: mimeType });
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = () => resolve(null);
-            reader.readAsDataURL(blob);
-        });
+        return await blobToDataUrl(blob);
     } catch (e) {
         console.warn('Error parsing FLAC picture block:', e);
         return null;
@@ -1341,7 +1336,7 @@ function extractFlacCover(arrayBuffer, dataView) {
 /**
  * Extract cover from MP3 ID3v2 tags
  */
-function extractMp3Cover(arrayBuffer, dataView) {
+async function extractMp3Cover(arrayBuffer, dataView) {
     try {
         // Check for ID3v2 header
         if (arrayBuffer.byteLength < 10) return null;
@@ -1380,12 +1375,7 @@ function extractMp3Cover(arrayBuffer, dataView) {
                 const imgData = new Uint8Array(arrayBuffer, mimeEnd, frameSize - (mimeEnd - offset - 6));
                 const blob = new Blob([imgData], { type: mimeType });
 
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.onerror = () => resolve(null);
-                    reader.readAsDataURL(blob);
-                });
+                return await blobToDataUrl(blob);
             }
 
             offset += frameSize;
@@ -1399,7 +1389,7 @@ function extractMp3Cover(arrayBuffer, dataView) {
 /**
  * Extract cover from M4A/MP4 metadata
  */
-function extractM4aCover(arrayBuffer, dataView) {
+async function extractM4aCover(arrayBuffer, dataView) {
     try {
         // This is simplified - M4A cover extraction is complex
         // For now, return null (same fallback as before)
@@ -1408,4 +1398,16 @@ function extractM4aCover(arrayBuffer, dataView) {
         console.warn('Error extracting M4A cover:', e);
     }
     return null;
+}
+
+/**
+ * Convert a Blob to a data URL
+ */
+function blobToDataUrl(blob) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(blob);
+    });
 }

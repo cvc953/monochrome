@@ -1325,10 +1325,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 window.localFilesCache = tracks;
-                // Store metadata without file objects (they can't be serialized)
                 const tracksToStore = tracks.map(t => ({
-                    ...t,
-                    webkitRelativePath: undefined
+                    id: t.id,
+                    title: t.title,
+                    artists: t.artists,
+                    artist: t.artist,
+                    album: t.album,
+                    duration: t.duration,
+                    isLocal: t.isLocal,
+                    webkitRelativePath: undefined,
+                    file: undefined
                 }));
                 await db.saveSetting('local_files_cache', tracksToStore);
                 ui.renderLibraryPage();
