@@ -2293,19 +2293,31 @@ input:checked+.toggle-switch:hover .slider::before {
     min-width: 0;
     display: block;
     position: relative;
+    height: 2.4rem;
 }
 
-#fullscreen-track-title:hover {
-    animation: marquee 10s linear infinite;
+#fullscreen-track-title.has-scroll,
+#fullscreen-track-artist.has-scroll {
+    text-overflow: clip;
 }
 
-@keyframes marquee {
+#fullscreen-track-title.has-scroll .scrolling-text,
+#fullscreen-track-artist.has-scroll .scrolling-text {
+    position: absolute;
+    left: 0;
+    top: 0;
+    white-space: nowrap;
+    animation: scroll-left 15s linear infinite;
+    will-change: transform;
+}
+
+@keyframes scroll-left {
     0% {
         transform: translateX(0);
     }
 
     100% {
-        transform: translateX(calc(-100% + 90vw));
+        transform: translateX(-100%);
     }
 }
 
@@ -2320,6 +2332,8 @@ input:checked+.toggle-switch:hover .slider::before {
     width: 100%;
     min-width: 0;
     display: block;
+    position: relative;
+    height: 1.8rem;
     transition:
         color 0.2s,
         text-decoration 0.2s;
@@ -4144,7 +4158,7 @@ img[src=''] {
         grid-area: header;
         margin-bottom: var(--spacing-md);
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: flex-start;
         gap: var(--spacing-sm);
     }
 
@@ -4154,11 +4168,13 @@ img[src=''] {
 
     .hamburger-menu {
         order: 1;
+        flex-shrink: 0;
     }
 
     .search-bar {
-        order: 3;
-        width: 100%;
+        order: 2;
+        flex: 1;
+        max-width: calc(100% - var(--header-control-height) - var(--spacing-sm));
     }
 
     .sidebar {

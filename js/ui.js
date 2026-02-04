@@ -691,8 +691,28 @@ export class UIRenderer {
         }
 
         const qualityBadge = createQualityBadgeHTML(track);
-        title.innerHTML = `${escapeHtml(track.title)} ${qualityBadge}`;
-        artist.textContent = getTrackArtists(track);
+        const trackTitle = track.title;
+        const trackArtist = getTrackArtists(track);
+
+        // Check if title has more than 3 words
+        const titleWordCount = trackTitle.trim().split(/\s+/).length;
+        if (titleWordCount > 3) {
+            title.innerHTML = `<span class="scrolling-text">${escapeHtml(trackTitle)} ${qualityBadge}</span>`;
+            title.classList.add('has-scroll');
+        } else {
+            title.innerHTML = `${escapeHtml(trackTitle)} ${qualityBadge}`;
+            title.classList.remove('has-scroll');
+        }
+
+        // Check if artist has more than 3 words
+        const artistWordCount = trackArtist.trim().split(/\s+/).length;
+        if (artistWordCount > 3) {
+            artist.innerHTML = `<span class="scrolling-text">${escapeHtml(trackArtist)}</span>`;
+            artist.classList.add('has-scroll');
+        } else {
+            artist.textContent = trackArtist;
+            artist.classList.remove('has-scroll');
+        }
 
         if (nextTrack) {
             nextTrackEl.style.display = 'flex';

@@ -296,12 +296,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (selectLocalBtn && browserWarning) {
         const ua = navigator.userAgent;
-        const isChromeOrEdge = (ua.indexOf('Chrome') > -1 || ua.indexOf('Edg') > -1) && !/Mobile|Android/.test(ua);
+        const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
         const hasFileSystemApi = 'showDirectoryPicker' in window;
 
-        if (!isChromeOrEdge || !hasFileSystemApi) {
-            selectLocalBtn.style.display = 'none';
-            browserWarning.style.display = 'block';
+        // Hide warning on mobile (we'll use file input instead)
+        if (isMobile || !hasFileSystemApi) {
+            browserWarning.style.display = 'none';
         }
     }
 
@@ -1199,6 +1199,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Local Files Logic lollll
         if (e.target.closest('#select-local-folder-btn') || e.target.closest('#change-local-folder-btn')) {
+            const isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
+            const hasFileSystemApi = 'showDirectoryPicker' in window;
+
+            // Use file input for mobile devices
+            if (isMobile || !hasFileSystemApi) {
+                const fileInput = document.getElementById('mobile-music-picker');
+                if (fileInput) {
+                    fileInput.click();
+                }
+                return;
+            }
+
             try {
                 const handle = await window.showDirectoryPicker({
                     id: 'music-folder',
@@ -1265,6 +1277,56 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
     });
+
+    // Handle mobile file picker
+    const mobileFilePicker = document.getElementById('mobile-music-picker');
+    if (mobileFilePicker) {
+        mobileFilePicker.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            const btn = document.getElementById('select-local-folder-btn');
+            const btnText = document.getElementById('select-local-folder-text');
+            
+            try {
+                if (btn) {
+                    if (btnText) btnText.textContent = 'Loading...';
+                    else btn.textContent = 'Loading...';
+                    btn.disabled = true;
+                }
+
+                const tracks = [];
+                let idCounter = 0;
+
+                for (const file of files) {
+                    if (file.type.startsWith('audio/')) {
+                        const metadata = await readTrackMetadata(file);
+                        metadata.id = `local-${idCounter++}-${file.name}`;
+                        tracks.push(metadata);
+                    }
+                }
+
+                tracks.sort((a, b) => {
+                    const artistA = a.artist.name || '';
+                    const artistB = b.artist.name || '';
+                    return artistA.localeCompare(artistB);
+                });
+
+                window.localFilesCache = tracks;
+                await db.saveSetting('local_files_loaded', true);
+                ui.renderLibraryPage();
+            } catch (err) {
+                console.error('Error loading files:', err);
+                alert('Failed to load files. Please try again.');
+            } finally {
+                if (btn) {
+                    if (btnText) btnText.textContent = 'Select Music Files';
+                    else btn.textContent = 'Select Music Files';
+                    btn.disabled = false;
+                }
+            }
+        });
+    }
 
     const searchForm = document.getElementById('search-form');
     const searchInput = document.getElementById('search-input');
