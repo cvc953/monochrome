@@ -1226,98 +1226,86 @@ document.addEventListener('DOMContentLoaded', async () => {
             const isAndroid = /Android/i.test(navigator.userAgent);
             const hasFileSystemApi = 'showDirectoryPicker' in window;
 
-            // Try Capacitor for Android first
+            // Try native Capacitor LocalMusic plugin for Android
             if (isAndroid && window.Capacitor) {
                 try {
-                    const { Filesystem, Directory } = window.Capacitor.Plugins;
-
+                    const { LocalMusic } = window.Capacitor.Plugins;
+                    
                     const btn = document.getElementById('select-local-folder-btn');
                     const btnText = document.getElementById('select-local-folder-text');
                     if (btn) {
-                        if (btnText) btnText.textContent = 'Scanning Music folder...';
-                        else btn.textContent = 'Scanning Music folder...';
+                        if (btnText) btnText.textContent = 'Selecting folder...';
+                        else btn.textContent = 'Selecting folder...';
                         btn.disabled = true;
                     }
 
-                    const audioExtensions = ['.flac', '.mp3', '.m4a', '.wav', '.ogg'];
-                    const audioFiles = [];
-
-                    // Try to read Music directory from external storage
+                    // Use native folder picker
+                    let result;
                     try {
-                        const musicDir = await Filesystem.readdir({
-                            path: 'Music',
-                            directory: Directory.ExternalStorage
-                        });
-
-                        async function scanCapacitorDir(dirPath, dirEntries) {
-                            for (const item of dirEntries.files) {
-                                if (item.type === 'file' && audioExtensions.some(ext => item.name.toLowerCase().endsWith(ext))) {
-                                    try {
-                                        const fileUri = `${dirPath}/${item.name}`;
-                                        const fileData = await Filesystem.readFile({
-                                            path: fileUri,
-                                            directory: Directory.ExternalStorage
-                                        });
-
-                                        const blob = new Blob([new Uint8Array(fileData.data)], {
-                                            type: 'audio/' + item.name.split('.').pop()
-                                        });
-                                        const file = new File([blob], item.name, { type: blob.type });
-
-                                        const { readTrackMetadata } = await import('./metadata.js');
-                                        const metadata = await readTrackMetadata(file);
-                                        audioFiles.push({
-                                            ...metadata,
-                                            id: `local-${item.name}-${fileUri}`
-                                        });
-                                        console.log('Added local file:', item.name, 'Cover:', metadata.album.cover !== 'assets/appicon.png' ? 'Found' : 'Not found');
-                                    } catch (err) {
-                                        console.warn('Error reading file:', item.name, err);
-                                    }
-                                } else if (item.type === 'directory') {
-                                    try {
-                                        const subDir = await Filesystem.readdir({
-                                            path: `${dirPath}/${item.name}`,
-                                            directory: Directory.ExternalStorage
-                                        });
-                                        await scanCapacitorDir(`${dirPath}/${item.name}`, subDir);
-                                    } catch (err) {
-                                        console.warn('Error scanning subdirectory:', item.name, err);
-                                    }
-                                }
-                            }
-                        }
-
-                        await scanCapacitorDir('Music', musicDir);
-
-                        if (audioFiles.length === 0) {
-                            throw new Error('No audio files found');
-                        }
-
-                        window.localFilesCache = audioFiles;
-                        await db.saveSetting('local_files_cache', audioFiles.map(t => ({
-                            title: t.title,
-                            artist: t.artist,
-                            album: t.album,
-                            duration: t.duration,
-                            isLocal: t.isLocal,
-                            id: t.id
-                        })));
-                        ui.renderLibraryPage();
-                        showNotification(`Loaded ${audioFiles.length} local files`);
-
-                        if (btn) {
-                            if (btnText) btnText.textContent = `Loaded ${audioFiles.length} tracks`;
-                            else btn.textContent = `Loaded ${audioFiles.length} tracks`;
-                            btn.disabled = false;
-                        }
-                        return;
-                    } catch (err) {
-                        console.warn('Error accessing Music folder via Capacitor:', err);
-                        throw err;
+                        result = await LocalMusic.pickMusicFolder();
+                    } catch (e) {
+                        // If folder picker fails, try scanning default Music directory
+                        console.log('Folder picker failed, scanning default Music directory...');
+                        result = await LocalMusic.scanMusicDirectory();
                     }
+                    
+                    const filesData = result.files;
+
+                    if (!filesData || filesData.length === 0) {
+                        throw new Error('No audio files found');
+                    }
+
+                    const audioFiles = [];
+                    const { readTrackMetadata } = await import('./metadata.js');
+
+                    // Process each file
+                    for (const fileData of filesData) {
+                        try {
+                            // Read file bytes using native plugin
+                            const fileBytes = await LocalMusic.readFileBytes({ path: fileData.path });
+                            
+                            // Convert base64 to blob
+                            const binaryString = atob(fileBytes.data);
+                            const bytes = new Uint8Array(binaryString.length);
+                            for (let i = 0; i < binaryString.length; i++) {
+                                bytes[i] = binaryString.charCodeAt(i);
+                            }
+                            
+                            const mimeType = 'audio/' + fileData.name.split('.').pop().toLowerCase();
+                            const blob = new Blob([bytes], { type: mimeType });
+                            const file = new File([blob], fileData.name, { type: mimeType });
+
+                            const metadata = await readTrackMetadata(file);
+                            audioFiles.push({
+                                ...metadata,
+                                id: `local-${fileData.name}-${fileData.path}`
+                            });
+                            console.log('Added local file:', fileData.name, 'Cover:', metadata.album.cover !== 'assets/appicon.png' ? 'Found' : 'Not found');
+                        } catch (err) {
+                            console.warn('Error processing file:', fileData.name, err);
+                        }
+                    }
+
+                    window.localFilesCache = audioFiles;
+                    await db.saveSetting('local_files_cache', audioFiles.map(t => ({
+                        title: t.title,
+                        artist: t.artist,
+                        album: t.album,
+                        duration: t.duration,
+                        isLocal: t.isLocal,
+                        id: t.id
+                    })));
+                    ui.renderLibraryPage();
+                    showNotification(`Loaded ${audioFiles.length} local files`);
+
+                    if (btn) {
+                        if (btnText) btnText.textContent = `Loaded ${audioFiles.length} tracks`;
+                        else btn.textContent = `Loaded ${audioFiles.length} tracks`;
+                        btn.disabled = false;
+                    }
+                    return;
                 } catch (err) {
-                    console.warn('Capacitor access failed, using file picker fallback:', err);
+                    console.warn('Native LocalMusic plugin failed, using fallback:', err);
                     // Fall through to file picker
                 }
             }
