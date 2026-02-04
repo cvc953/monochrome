@@ -403,21 +403,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (shareBtn) shareBtn.style.display = e.target.checked ? 'flex' : 'none';
     });
 
-    document.getElementById('close-fullscreen-cover-btn')?.addEventListener('click', () => {
-        if (window.location.hash === '#fullscreen') {
-            window.history.back();
-        } else {
-            ui.closeFullscreenCover();
-        }
-    });
-
-    document.getElementById('fullscreen-cover-image')?.addEventListener('click', () => {
-        if (window.location.hash === '#fullscreen') {
-            window.history.back();
-        } else {
-            ui.closeFullscreenCover();
-        }
-    });
+    // Disable closing fullscreen on simple taps to avoid accidental closes on mobile.
+    // Fullscreen now only closes via scroll (drag down) or the Android back button.
+    // If you want a visible close control later, re-enable with an explicit affordance.
 
     document.getElementById('sidebar-toggle')?.addEventListener('click', () => {
         document.body.classList.toggle('sidebar-collapsed');
@@ -1229,7 +1217,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Try native Capacitor LocalMusic plugin for Android
             if (isAndroid && window.Capacitor) {
                 try {
-                    const { LocalMusic } = window.Capacitor.Plugins;
+                    let LocalMusic = null;
+                    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalMusic) {
+                        LocalMusic = window.Capacitor.Plugins.LocalMusic;
+                    } else if (window.LocalMusic) {
+                        LocalMusic = window.LocalMusic;
+                    }
+
+                    if (!LocalMusic) {
+                        throw new Error('Native LocalMusic plugin not available');
+                    }
 
                     const btn = document.getElementById('select-local-folder-btn');
                     const btnText = document.getElementById('select-local-folder-text');
@@ -1262,7 +1259,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     for (const fileData of filesData) {
                         try {
                             // Read file bytes using native plugin
-                            const fileBytes = await LocalMusic.readFileBytes({ path: fileData.path });
+                            // prefer content uri if provided by native plugin (SAF)
+                            const readArgs = fileData.path ? { path: fileData.path } : (fileData.uri ? { uri: fileData.uri } : {});
+                            const fileBytes = await LocalMusic.readFileBytes(readArgs);
 
                             // Convert base64 to blob
                             const binaryString = atob(fileBytes.data);

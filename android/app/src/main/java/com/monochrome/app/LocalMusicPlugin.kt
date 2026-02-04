@@ -1,10 +1,12 @@
 package com.monochrome.app
 
+import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.util.Log
+import androidx.documentfile.provider.DocumentFile
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -56,22 +58,36 @@ class LocalMusicPlugin : Plugin() {
     @PluginMethod
     fun readFileBytes(call: PluginCall) {
         val path = call.getString("path")
-        if (path == null) {
-            call.reject("Path is required")
-            return
-        }
+        val uriStr = call.getString("uri")
 
         try {
-            val file = File(path)
-            if (!file.exists()) {
-                call.reject("File not found: $path")
+            val bytes: ByteArray? =
+                    when {
+                        path != null -> {
+                            val file = File(path)
+                            if (!file.exists()) {
+                                call.reject("File not found: $path")
+                                return
+                            }
+                            file.readBytes()
+                        }
+                        uriStr != null -> {
+                            val uri = Uri.parse(uriStr)
+                            val resolver: ContentResolver = bridge.context.contentResolver
+                            resolver.openInputStream(uri)?.use { it.readBytes() }
+                        }
+                        else -> {
+                            call.reject("Path or uri is required")
+                            return
+                        }
+                    }
+
+            if (bytes == null) {
+                call.reject("Unable to read file bytes")
                 return
             }
 
-            val bytes = file.readBytes()
-            // Convert to base64 for JSON transfer
             val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-
             val result = JSObject()
             result.put("data", base64)
             result.put("size", bytes.size)
@@ -118,16 +134,27 @@ class LocalMusicPlugin : Plugin() {
             if (treeUri != null) {
                 try {
                     val path = getPathFromUri(treeUri)
-                    if (path != null) {
-                        val files = mutableListOf<JSObject>()
-                        scanDirectory(File(path), files)
+                    val files = mutableListOf<JSObject>()
 
+                    if (path != null) {
+                        // File-system path available
+                        scanDirectory(File(path), files)
                         val result = JSObject()
                         result.put("files", JSONArray(files))
                         result.put("path", path)
                         pendingCall?.resolve(result)
                     } else {
-                        pendingCall?.reject("Could not access selected folder")
+                        // Try to scan using DocumentFile (SAF)
+                        val docFile = DocumentFile.fromTreeUri(context, treeUri)
+                        if (docFile != null && docFile.isDirectory) {
+                            scanDocumentFile(docFile, files)
+                            val result = JSObject()
+                            result.put("files", JSONArray(files))
+                            result.put("uri", treeUri.toString())
+                            pendingCall?.resolve(result)
+                        } else {
+                            pendingCall?.reject("Could not access selected folder")
+                        }
                     }
                 } catch (e: Exception) {
                     Log.e("LocalMusic", "Error processing folder selection", e)
@@ -135,6 +162,38 @@ class LocalMusicPlugin : Plugin() {
                 }
             }
             pendingCall = null
+        }
+    }
+
+    private fun scanDocumentFile(dir: DocumentFile, results: MutableList<JSObject>) {
+        try {
+            val children = dir.listFiles()
+            for (child in children) {
+                if (child.isDirectory) {
+                    if (!child.name.isNullOrEmpty() && !child.name!!.startsWith(".")) {
+                        scanDocumentFile(child, results)
+                    }
+                } else if (child.isFile) {
+                    val name = child.name ?: continue
+                    val extension = name.substringAfterLast('.', "").lowercase()
+                    if (extension in AUDIO_EXTENSIONS) {
+                        try {
+                            val fileObj = JSObject()
+                            fileObj.put("name", name)
+                            fileObj.put("uri", child.uri.toString())
+                            try {
+                                fileObj.put("size", child.length())
+                            } catch (e: Exception) {}
+                            results.add(fileObj)
+                            Log.d("LocalMusic", "Found audio file (SAF): $name")
+                        } catch (e: JSONException) {
+                            Log.e("LocalMusic", "Error adding SAF file to results", e)
+                        }
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("LocalMusic", "Error scanning DocumentFile directory", e)
         }
     }
 
