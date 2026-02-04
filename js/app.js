@@ -1223,9 +1223,106 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Local Files Logic lollll
         if (e.target.closest('#select-local-folder-btn') || e.target.closest('#change-local-folder-btn')) {
             const isMobile = /Mobile|Android|iPhone|iPad/i.test(navigator.userAgent);
+            const isAndroid = /Android/i.test(navigator.userAgent);
             const hasFileSystemApi = 'showDirectoryPicker' in window;
 
-            // Use file input for mobile devices
+            // Try Capacitor for Android first
+            if (isAndroid && window.Capacitor) {
+                try {
+                    const { Filesystem, Directory } = window.Capacitor.Plugins;
+                    
+                    const btn = document.getElementById('select-local-folder-btn');
+                    const btnText = document.getElementById('select-local-folder-text');
+                    if (btn) {
+                        if (btnText) btnText.textContent = 'Scanning Music folder...';
+                        else btn.textContent = 'Scanning Music folder...';
+                        btn.disabled = true;
+                    }
+
+                    const audioExtensions = ['.flac', '.mp3', '.m4a', '.wav', '.ogg'];
+                    const audioFiles = [];
+
+                    // Try to read Music directory from external storage
+                    try {
+                        const musicDir = await Filesystem.readdir({
+                            path: 'Music',
+                            directory: Directory.ExternalStorage
+                        });
+
+                        async function scanCapacitorDir(dirPath, dirEntries) {
+                            for (const item of dirEntries.files) {
+                                if (item.type === 'file' && audioExtensions.some(ext => item.name.toLowerCase().endsWith(ext))) {
+                                    try {
+                                        const fileUri = `${dirPath}/${item.name}`;
+                                        const fileData = await Filesystem.readFile({ 
+                                            path: fileUri, 
+                                            directory: Directory.ExternalStorage 
+                                        });
+                                        
+                                        const blob = new Blob([new Uint8Array(fileData.data)], { 
+                                            type: 'audio/' + item.name.split('.').pop() 
+                                        });
+                                        const file = new File([blob], item.name, { type: blob.type });
+                                        
+                                        const { readTrackMetadata } = await import('./metadata.js');
+                                        const metadata = await readTrackMetadata(file);
+                                        audioFiles.push({
+                                            ...metadata,
+                                            id: `local-${item.name}-${fileUri}`
+                                        });
+                                        console.log('Added local file:', item.name, 'Cover:', metadata.album.cover !== 'assets/appicon.png' ? 'Found' : 'Not found');
+                                    } catch (err) {
+                                        console.warn('Error reading file:', item.name, err);
+                                    }
+                                } else if (item.type === 'directory') {
+                                    try {
+                                        const subDir = await Filesystem.readdir({
+                                            path: `${dirPath}/${item.name}`,
+                                            directory: Directory.ExternalStorage
+                                        });
+                                        await scanCapacitorDir(`${dirPath}/${item.name}`, subDir);
+                                    } catch (err) {
+                                        console.warn('Error scanning subdirectory:', item.name, err);
+                                    }
+                                }
+                            }
+                        }
+
+                        await scanCapacitorDir('Music', musicDir);
+
+                        if (audioFiles.length === 0) {
+                            throw new Error('No audio files found');
+                        }
+
+                        window.localFilesCache = audioFiles;
+                        await db.saveSetting('local_files_cache', audioFiles.map(t => ({
+                            title: t.title,
+                            artist: t.artist,
+                            album: t.album,
+                            duration: t.duration,
+                            isLocal: t.isLocal,
+                            id: t.id
+                        })));
+                        ui.renderLibraryPage();
+                        showNotification(`Loaded ${audioFiles.length} local files`);
+
+                        if (btn) {
+                            if (btnText) btnText.textContent = `Loaded ${audioFiles.length} tracks`;
+                            else btn.textContent = `Loaded ${audioFiles.length} tracks`;
+                            btn.disabled = false;
+                        }
+                        return;
+                    } catch (err) {
+                        console.warn('Error accessing Music folder via Capacitor:', err);
+                        throw err;
+                    }
+                } catch (err) {
+                    console.warn('Capacitor access failed, using file picker fallback:', err);
+                    // Fall through to file picker
+                }
+            }
+
+            // Use file input for mobile devices or as fallback
             if (isMobile || !hasFileSystemApi) {
                 const fileInput = document.getElementById('mobile-music-picker');
                 if (fileInput) {

@@ -76,10 +76,13 @@ export async function readTrackMetadata(file) {
 
     try {
         if (file.type === 'audio/flac' || file.name.endsWith('.flac')) {
+            console.debug('Reading FLAC metadata for:', file.name);
             await readFlacMetadata(file, metadata);
         } else if (file.type === 'audio/mp4' || file.name.endsWith('.m4a')) {
+            console.debug('Reading M4A metadata for:', file.name);
             await readM4aMetadata(file, metadata);
         } else if (file.type === 'audio/mpeg' || file.name.endsWith('.mp3')) {
+            console.debug('Reading MP3 metadata for:', file.name);
             await readMp3Metadata(file, metadata);
         }
     } catch (e) {
@@ -92,9 +95,13 @@ export async function readTrackMetadata(file) {
 
     // Try to extract cover art from the file
     try {
+        console.debug('Attempting to extract cover art from:', file.name);
         const coverDataUrl = await extractCoverArtFromFile(file);
         if (coverDataUrl) {
             metadata.album.cover = coverDataUrl;
+            console.debug('Cover art extracted and set for:', file.name);
+        } else {
+            console.debug('No cover art found for:', file.name);
         }
     } catch (e) {
         console.warn('Error extracting cover art for', file.name, e);
@@ -1267,11 +1274,11 @@ async function extractCoverArtFromFile(file) {
         const dataView = new DataView(arrayBuffer);
 
         if (file.name.endsWith('.flac') || file.type === 'audio/flac') {
-            return extractFlacCover(arrayBuffer, dataView);
+            return await extractFlacCover(arrayBuffer, dataView);
         } else if (file.name.endsWith('.mp3') || file.type === 'audio/mpeg') {
-            return extractMp3Cover(arrayBuffer, dataView);
+            return await extractMp3Cover(arrayBuffer, dataView);
         } else if (file.name.endsWith('.m4a') || file.type === 'audio/mp4') {
-            return extractM4aCover(arrayBuffer, dataView);
+            return await extractM4aCover(arrayBuffer, dataView);
         }
     } catch (e) {
         console.warn('Error extracting cover from file:', e);
@@ -1289,7 +1296,10 @@ async function extractFlacCover(arrayBuffer, dataView) {
     // Find PICTURE block (type 6)
     const pictureBlock = blocks.find((b) => b.type === 6);
 
-    if (!pictureBlock) return null;
+    if (!pictureBlock) {
+        console.debug('No PICTURE block found in FLAC');
+        return null;
+    }
 
     try {
         const offset = pictureBlock.offset;
@@ -1326,7 +1336,9 @@ async function extractFlacCover(arrayBuffer, dataView) {
 
         // Convert to data URL
         const blob = new Blob([imgData], { type: mimeType });
-        return await blobToDataUrl(blob);
+        const dataUrl = await blobToDataUrl(blob);
+        console.debug('FLAC cover extracted successfully:', mimeType, 'Size:', imgDataLen);
+        return dataUrl;
     } catch (e) {
         console.warn('Error parsing FLAC picture block:', e);
         return null;
@@ -1375,7 +1387,9 @@ async function extractMp3Cover(arrayBuffer, dataView) {
                 const imgData = new Uint8Array(arrayBuffer, mimeEnd, frameSize - (mimeEnd - offset - 6));
                 const blob = new Blob([imgData], { type: mimeType });
 
-                return await blobToDataUrl(blob);
+                const dataUrl = await blobToDataUrl(blob);
+                console.debug('MP3 cover extracted successfully:', mimeType, 'Size:', imgData.length);
+                return dataUrl;
             }
 
             offset += frameSize;
