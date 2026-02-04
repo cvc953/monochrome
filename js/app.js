@@ -1230,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isAndroid && window.Capacitor) {
                 try {
                     const { Filesystem, Directory } = window.Capacitor.Plugins;
-                    
+
                     const btn = document.getElementById('select-local-folder-btn');
                     const btnText = document.getElementById('select-local-folder-text');
                     if (btn) {
@@ -1254,16 +1254,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 if (item.type === 'file' && audioExtensions.some(ext => item.name.toLowerCase().endsWith(ext))) {
                                     try {
                                         const fileUri = `${dirPath}/${item.name}`;
-                                        const fileData = await Filesystem.readFile({ 
-                                            path: fileUri, 
-                                            directory: Directory.ExternalStorage 
+                                        const fileData = await Filesystem.readFile({
+                                            path: fileUri,
+                                            directory: Directory.ExternalStorage
                                         });
-                                        
-                                        const blob = new Blob([new Uint8Array(fileData.data)], { 
-                                            type: 'audio/' + item.name.split('.').pop() 
+
+                                        const blob = new Blob([new Uint8Array(fileData.data)], {
+                                            type: 'audio/' + item.name.split('.').pop()
                                         });
                                         const file = new File([blob], item.name, { type: blob.type });
-                                        
+
                                         const { readTrackMetadata } = await import('./metadata.js');
                                         const metadata = await readTrackMetadata(file);
                                         audioFiles.push({
