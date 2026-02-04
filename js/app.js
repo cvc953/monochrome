@@ -337,6 +337,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         ui.setCurrentTrack(player.currentTrack);
     }
 
+    // Click anywhere on the now-playing-bar (except the cover) to open fullscreen
+    document.querySelector('.now-playing-bar').addEventListener('click', (e) => {
+        // Don't open fullscreen if clicking on the cover or its child elements
+        if (e.target.closest('.cover')) return;
+
+        if (!player.currentTrack) {
+            alert('No track is currently playing');
+            return;
+        }
+
+        const overlay = document.getElementById('fullscreen-cover-overlay');
+        if (overlay && overlay.style.display === 'flex') {
+            if (window.location.hash === '#fullscreen') {
+                window.history.back();
+            } else {
+                ui.closeFullscreenCover();
+            }
+        } else {
+            const nextTrack = player.getNextTrack();
+            ui.showFullscreenCover(player.currentTrack, nextTrack, lyricsManager, audioPlayer);
+        }
+    });
+
     document.querySelector('.now-playing-bar .cover').addEventListener('click', async () => {
         if (!player.currentTrack) {
             alert('No track is currently playing');

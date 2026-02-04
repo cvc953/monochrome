@@ -359,7 +359,7 @@ kbd {
     grid-area: main;
     overflow-y: auto;
     padding: var(--spacing-xl);
-    padding-top: calc(var(--spacing-xl) + 80px);
+    padding-top: 1.25rem;
     scroll-behavior: smooth;
     position: relative;
 
@@ -532,7 +532,7 @@ kbd {
     justify-content: center;
     align-items: center;
     margin-bottom: var(--spacing-xl);
-    margin-top: 1.25rem;
+    margin-top: 3.5rem;
     gap: var(--spacing-md);
     position: relative;
     z-index: 1000;
