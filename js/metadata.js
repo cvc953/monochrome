@@ -90,6 +90,16 @@ export async function readTrackMetadata(file) {
         metadata.artist = metadata.artists[0];
     }
 
+    // Try to extract cover art from the file
+    try {
+        const coverDataUrl = await extractCoverArtFromFile(file);
+        if (coverDataUrl) {
+            metadata.album.cover = coverDataUrl;
+        }
+    } catch (e) {
+        console.warn('Error extracting cover art for', file.name, e);
+    }
+
     return metadata;
 }
 
@@ -1246,4 +1256,156 @@ function findAndShiftOffsets(view, start, end, shift) {
 
         offset += size;
     }
+}
+/**
+ * Extract cover art from local audio files (FLAC, MP3, M4A)
+ * Returns a data URL or null if no cover found
+ */
+async function extractCoverArtFromFile(file) {
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const dataView = new DataView(arrayBuffer);
+
+        if (file.name.endsWith('.flac') || file.type === 'audio/flac') {
+            return extractFlacCover(arrayBuffer, dataView);
+        } else if (file.name.endsWith('.mp3') || file.type === 'audio/mpeg') {
+            return extractMp3Cover(arrayBuffer, dataView);
+        } else if (file.name.endsWith('.m4a') || file.type === 'audio/mp4') {
+            return extractM4aCover(arrayBuffer, dataView);
+        }
+    } catch (e) {
+        console.warn('Error extracting cover from file:', e);
+    }
+    return null;
+}
+
+/**
+ * Extract cover from FLAC metadata blocks (METADATA_BLOCK_PICTURE)
+ */
+function extractFlacCover(arrayBuffer, dataView) {
+    if (!isFlacFile(dataView)) return null;
+
+    const blocks = parseFlacBlocks(dataView);
+    // Find PICTURE block (type 6)
+    const pictureBlock = blocks.find((b) => b.type === 6);
+
+    if (!pictureBlock) return null;
+
+    try {
+        const offset = pictureBlock.offset;
+        const blockData = new DataView(arrayBuffer, offset, pictureBlock.size);
+
+        // Picture block structure:
+        // - picture type (4 bytes)
+        // - MIME type length (4 bytes) + MIME type string
+        // - description length (4 bytes) + description string
+        // - width (4 bytes), height (4 bytes), color depth (4 bytes), colors (4 bytes)
+        // - image data length (4 bytes) + image data
+
+        let pos = 0;
+        // Skip picture type
+        pos += 4;
+
+        // Read MIME type
+        const mimeLen = blockData.getUint32(pos, false);
+        pos += 4;
+        const mimeType = new TextDecoder().decode(new Uint8Array(arrayBuffer, offset + pos, mimeLen));
+        pos += mimeLen;
+
+        // Skip description
+        const descLen = blockData.getUint32(pos, false);
+        pos += 4 + descLen;
+
+        // Skip width, height, color depth, colors
+        pos += 16;
+
+        // Get image data
+        const imgDataLen = blockData.getUint32(pos, false);
+        pos += 4;
+        const imgData = new Uint8Array(arrayBuffer, offset + pos, imgDataLen);
+
+        // Convert to data URL
+        const blob = new Blob([imgData], { type: mimeType });
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+        console.warn('Error parsing FLAC picture block:', e);
+        return null;
+    }
+}
+
+/**
+ * Extract cover from MP3 ID3v2 tags
+ */
+function extractMp3Cover(arrayBuffer, dataView) {
+    try {
+        // Check for ID3v2 header
+        if (arrayBuffer.byteLength < 10) return null;
+
+        const header = new Uint8Array(arrayBuffer, 0, 3);
+        if (header[0] !== 0x49 || header[1] !== 0x44 || header[2] !== 0x33) return null; // "ID3"
+
+        const version = header[0];
+        const flags = new Uint8Array(arrayBuffer, 5, 1)[0];
+        let tagSize = 0;
+        const sizeBytes = new Uint8Array(arrayBuffer, 6, 4);
+        // ID3 tag size is syncsafe (7 bits per byte)
+        tagSize = ((sizeBytes[0] & 0x7f) << 21) | ((sizeBytes[1] & 0x7f) << 14) |
+            ((sizeBytes[2] & 0x7f) << 7) | (sizeBytes[3] & 0x7f);
+        tagSize += 10;
+
+        // Look for APIC frame (Attached Picture)
+        let offset = 10;
+        while (offset < Math.min(tagSize, arrayBuffer.byteLength - 10)) {
+            const frameId = new TextDecoder().decode(new Uint8Array(arrayBuffer, offset, 4));
+            offset += 4;
+
+            const frameSize = dataView.getUint32(offset, false);
+            offset += 6; // size + flags
+
+            if (frameId === 'APIC') {
+                offset += 1; // encoding
+                // Find MIME type terminator
+                let mimeEnd = offset;
+                while (mimeEnd < offset + 100 && new Uint8Array(arrayBuffer)[mimeEnd] !== 0) {
+                    mimeEnd++;
+                }
+                const mimeType = new TextDecoder().decode(new Uint8Array(arrayBuffer, offset, mimeEnd - offset));
+                mimeEnd += 2; // skip terminator and picture type
+
+                const imgData = new Uint8Array(arrayBuffer, mimeEnd, frameSize - (mimeEnd - offset - 6));
+                const blob = new Blob([imgData], { type: mimeType });
+
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = () => resolve(null);
+                    reader.readAsDataURL(blob);
+                });
+            }
+
+            offset += frameSize;
+        }
+    } catch (e) {
+        console.warn('Error extracting MP3 cover:', e);
+    }
+    return null;
+}
+
+/**
+ * Extract cover from M4A/MP4 metadata
+ */
+function extractM4aCover(arrayBuffer, dataView) {
+    try {
+        // This is simplified - M4A cover extraction is complex
+        // For now, return null (same fallback as before)
+        return null;
+    } catch (e) {
+        console.warn('Error extracting M4A cover:', e);
+    }
+    return null;
 }
