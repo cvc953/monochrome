@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
 
 android {
     namespace = "com.monochrome.app"
@@ -22,6 +24,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
 }
 
 repositories {
@@ -33,6 +42,7 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.documentfile:documentfile:1.0.1"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
@@ -52,3 +62,20 @@ try {
 } catch(Exception e) {
     logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
 }
+
+// Configure Kotlin jvmTarget if Kotlin compile task class is available.
+try {
+    def kotlinCompileClass = Class.forName("org.jetbrains.kotlin.gradle.tasks.KotlinCompile")
+    tasks.withType(kotlinCompileClass).configureEach {
+        kotlinOptions {
+                jvmTarget = "17"
+        }
+    }
+} catch (Exception ignored) {
+    // Kotlin plugin not applied or class not available; skip jvmTarget config.
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.1.0"
+}
+

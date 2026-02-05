@@ -25,6 +25,25 @@ import './smooth-scrolling.js';
 import { readTrackMetadata } from './metadata.js';
 import { initTracker } from './tracker.js';
 
+// Quick native plugin availability test: call LocalMusic.echo on startup when Capacitor is present.
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalMusic) {
+            try {
+                window.Capacitor.Plugins.LocalMusic.echo({ message: 'hello from web' })
+                    .then(res => console.log('LocalMusic.echo result', res))
+                    .catch(err => console.error('LocalMusic.echo error', err));
+            } catch (e) {
+                console.error('LocalMusic.echo threw', e);
+            }
+        } else {
+            console.log('LocalMusic plugin not present on startup');
+        }
+    } catch (e) {
+        console.error('Error checking LocalMusic plugin', e);
+    }
+});
+
 function initializeCasting(audioPlayer, castBtn) {
     if (!castBtn) return;
 
@@ -1217,6 +1236,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Try native Capacitor LocalMusic plugin for Android
             if (isAndroid && window.Capacitor) {
                 try {
+                    console.log('LocalFiles: detected Android + Capacitor, attempting native picker');
+                    try { showNotification('LocalFiles: opening native folder picker...'); } catch (e) { /* ignore if not available */ }
+                } catch (e) { }
+                try {
                     let LocalMusic = null;
                     if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalMusic) {
                         LocalMusic = window.Capacitor.Plugins.LocalMusic;
@@ -1225,6 +1248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
 
                     if (!LocalMusic) {
+                        try { showNotification('LocalFiles: native plugin not available, falling back'); } catch (e) { }
                         throw new Error('Native LocalMusic plugin not available');
                     }
 
@@ -1238,12 +1262,71 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     // Use native folder picker
                     let result;
+                    // Attach scan listeners so the UI shows scanning progress
+                    let scanStartedHandle = null;
+                    let scanProgressHandle = null;
+                    let scanCompletedHandle = null;
                     try {
+                        console.log('LocalFiles: calling LocalMusic.pickMusicFolder()');
+                        try { showNotification('LocalFiles: waiting for folder selection...'); } catch (e) { }
+
+                        try {
+                            scanStartedHandle = await LocalMusic.addListener('scanStarted', (ev) => {
+                                try {
+                                    if (btn) {
+                                        if (btnText) btnText.textContent = 'Scanning...';
+                                        else btn.textContent = 'Scanning...';
+                                    }
+                                    try { showNotification('LocalFiles: scanning started'); } catch (e) { }
+                                } catch (err) { }
+                            });
+                        } catch (e) { /* ignore listener attach failures */ }
+
+                        try {
+                            scanProgressHandle = await LocalMusic.addListener('scanProgress', (ev) => {
+                                try {
+                                    const count = ev && ev.count ? ev.count : null;
+                                    if (btn) {
+                                        if (count) {
+                                            if (btnText) btnText.textContent = `Scanning... (${count})`;
+                                            else btn.textContent = `Scanning... (${count})`;
+                                        }
+                                    }
+                                } catch (err) { }
+                            });
+                        } catch (e) { /* ignore */ }
+
+                        try {
+                            scanCompletedHandle = await LocalMusic.addListener('scanCompleted', (ev) => {
+                                try {
+                                    const count = ev && ev.count ? ev.count : null;
+                                    if (btn) {
+                                        if (count) {
+                                            if (btnText) btnText.textContent = `Scan complete (${count})`;
+                                            else btn.textContent = `Scan complete (${count})`;
+                                        } else {
+                                            if (btnText) btnText.textContent = 'Scan complete';
+                                            else btn.textContent = 'Scan complete';
+                                        }
+                                        btn.disabled = false;
+                                    }
+                                    try { showNotification('LocalFiles: scan completed'); } catch (e) { }
+                                } catch (err) { }
+                            });
+                        } catch (e) { /* ignore */ }
+
                         result = await LocalMusic.pickMusicFolder();
+                        console.log('LocalFiles: native pick result', result);
+                        try { showNotification('LocalFiles: folder selected'); } catch (e) { }
                     } catch (e) {
                         // If folder picker fails, try scanning default Music directory
                         console.log('Folder picker failed, scanning default Music directory...');
                         result = await LocalMusic.scanMusicDirectory();
+                    } finally {
+                        // remove listeners
+                        try { scanStartedHandle && scanStartedHandle.remove(); } catch (e) { }
+                        try { scanProgressHandle && scanProgressHandle.remove(); } catch (e) { }
+                        try { scanCompletedHandle && scanCompletedHandle.remove(); } catch (e) { }
                     }
 
                     const filesData = result.files;
@@ -1305,6 +1388,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return;
                 } catch (err) {
                     console.warn('Native LocalMusic plugin failed, using fallback:', err);
+                    try { showNotification('LocalFiles: native plugin failed, using fallback'); } catch (e) { }
                     // Fall through to file picker
                 }
             }
